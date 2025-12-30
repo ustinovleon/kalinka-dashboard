@@ -1923,15 +1923,15 @@
             const commissionOnly = amount * commissionPct / 100; // Комиссия БЕЗ кэшбонуса
             const grossIncome = commissionOnly + cashBonus;
             
-            // 2. Налог 10% от общей комиссии
-            const taxDeduction = grossIncome * 0.10;
+            // 2. Налог 5% от общей комиссии
+            const taxDeduction = grossIncome * 0.05;
             
             // 3. Комиссия нетто (после налога)
             const netAfterTax = grossIncome - taxDeduction;
             
             // 4. Доля внешнего партнёра - считается БЕЗ учёта кэшбонуса
             // База для партнёра = комиссия нетто минус кэшбонус (после налога)
-            const netCommissionOnly = commissionOnly * 0.90; // Комиссия без кэшбонуса, после налога
+            const netCommissionOnly = commissionOnly * 0.95; // Комиссия без кэшбонуса, после налога
             const partnerPayout = netCommissionOnly * (partnerPct / 100);
             
             // 5. База для распределения (РОП, брокер, компания)
