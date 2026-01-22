@@ -3086,6 +3086,7 @@
                                     <tr>
                                         <th class="sortable" data-sort="name">Сделка</th>
                                         <th>Источник</th>
+                                        <th class="sortable" data-sort="partner">Партнёр</th>
                                         <th class="sortable" data-sort="stage">Этап</th>
                                         <th class="sortable" data-sort="amount">Сумма</th>
                                         <th>Комиссия</th>
@@ -3432,6 +3433,22 @@
                         <div class="broker-grid" id="brokerGrid"></div>
                     </div>
                 </div>
+
+                <div class="section-card" style="margin-top: 24px;">
+                    <div class="section-header">
+                        <div class="section-header-left">
+                            <div class="section-icon peach">P</div>
+                            <div>
+                                <div class="section-title">Дашборд партнёров</div>
+                                <div class="section-subtitle">Внешние партнёры</div>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary btn-sm" onclick="openPartnersModal()">Управление</button>
+                    </div>
+                    <div class="section-body">
+                        <div class="broker-grid" id="partnerGrid"></div>
+                    </div>
+                </div>
             </div>
         </main>
     </div>
@@ -3476,9 +3493,12 @@
         // =============================================
         const CONFIG = {
             defaultBrokers: [
-                'Jarougit James', 'Roman Nikulenko', 'Kavrtirant Plus', 'Michael Pecherskiy',
+                'Jarougit James', 'Roman Nikulenko', 'Michael Pecherskiy',
                 'Leonid Ustinov', 'Mark Van Paassen', 'Victoria Kalichkina', 'Alexander Pecherskiy',
-                'Valeria Dramma', 'Tomazs Rozmus', 'Veronika Pfneiszl'
+                'Valeria Dramma', 'Veronika Pfneiszl'
+            ],
+            defaultPartners: [
+                'Квартирант плюс', 'Tomasz Rozmus'
             ],
             expenseCategories: {
                 rent: { name: 'Аренда', icon: '' },
@@ -3550,6 +3570,7 @@
             targets: {},
             cushion: 0,
             brokers: [...CONFIG.defaultBrokers],
+            partners: [...CONFIG.defaultPartners],
             syncing: false,
             settingsLoaded: false, // Track if plan targets have loaded
             dealsLoaded: false     // Track if deals have loaded
@@ -4089,12 +4110,15 @@
                         state.targets = (data && data.targets) || {};
                         state.cushion = (data && data.cushion) || 0;
                         state.brokers = (data && data.brokers) || [...CONFIG.defaultBrokers];
+                        state.partners = (data && data.partners) || [...CONFIG.defaultPartners];
                         state.settingsLoaded = true;
                         renderOverview(); // Fix: update YTD Plan when targets load
                         renderPlanning();
                         renderFinance();
                         renderBrokers();
+                        renderPartners();
                         updateBrokerSelects();
+                        updatePartnerSelects();
                     }
                 }, err => {
                     console.error('Settings listener error:', err);
@@ -4414,6 +4438,7 @@
             renderFinance();
             renderPlanning();
             renderBrokers();
+            renderPartners();
             renderPnL();
         }
 
@@ -4571,9 +4596,10 @@
                         case 'amount': aVal = parseFloat(a.amount) || 0; bVal = parseFloat(b.amount) || 0; break;
                         case 'probability': aVal = a.probability || 0; bVal = b.probability || 0; break;
                         case 'broker': aVal = a.broker || ''; bVal = b.broker || ''; break;
-                        case 'profit': 
-                            aVal = calculateDealFinancials(a).companyProfit; 
-                            bVal = calculateDealFinancials(b).companyProfit; 
+                        case 'partner': aVal = a.partner || ''; bVal = b.partner || ''; break;
+                        case 'profit':
+                            aVal = calculateDealFinancials(a).companyProfit;
+                            bVal = calculateDealFinancials(b).companyProfit;
                             break;
                         default: return 0;
                     }
@@ -4589,7 +4615,7 @@
             if (deals.length === 0) {
                 const hasFilters = dealsSearchQuery || dealsStageFilter || dealsBrokerFilter;
                 tbody.innerHTML = `
-                    <tr><td colspan="10">
+                    <tr><td colspan="11">
                         <div class="empty-state">
                             <div class="empty-state-icon">${hasFilters ? '' : ''}</div>
                             <div class="empty-state-title">${hasFilters ? 'Ничего не найдено' : 'Нет сделок'}</div>
@@ -4618,6 +4644,7 @@
                     <tr>
                         <td><strong>${d.name}</strong></td>
                         <td><span class="badge blue">${sourceLabels[d.leadSource] || '—'}</span></td>
+                        <td>${d.leadSource === 'partner' && d.partner ? `<span class="badge peach">${d.partner}</span>` : '—'}</td>
                         <td><span class="badge ${d.stage === 'closed' ? 'green' : d.stage === 'lost' ? 'red' : 'peach'}">${stageLabels[d.stage]}</span></td>
                         <td class="mono">${formatTHB(d.amount)}</td>
                         <td class="mono">${d.commissionPct || 0}%</td>
@@ -5201,16 +5228,25 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label class="form-label">Источник лида</label>
-                            <select class="form-select" id="dealLeadSource">
+                            <select class="form-select" id="dealLeadSource" onchange="togglePartnerSelect()">
                                 <option value="company">Компания</option>
                                 <option value="partner">Партнёр</option>
                                 <option value="own">Свой лид</option>
                             </select>
                         </div>
+                        <div class="form-group" id="partnerSelectGroup" style="display: none;">
+                            <label class="form-label">Партнёр *</label>
+                            <select class="form-select" id="dealPartnerName">
+                                <option value="">Выберите партнёра...</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
                         <div class="form-group">
                             <label class="form-label">Комиссия застройщика %</label>
                             <input type="number" class="form-input" id="dealCommPct" step="0.1" min="0" placeholder="Введите %" oninput="calcDealPreview()">
                         </div>
+                        <div class="form-group"></div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
@@ -5421,6 +5457,24 @@
                 <button type="button" class="btn btn-secondary" onclick="closeModal('brokersModal')">Закрыть</button>
             `);
 
+            // Partners Management Modal
+            container.innerHTML += createModal('partnersModal', 'Управление партнёрами', `
+                <div class="form-group">
+                    <label class="form-label">Добавить нового партнёра</label>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="text" class="form-input" id="newPartnerName" placeholder="Название партнёра" style="flex: 1;">
+                        <button type="button" class="btn btn-primary" onclick="addPartner()">+ Добавить</button>
+                    </div>
+                </div>
+                <div class="form-divider"></div>
+                <div class="form-section-title">Текущие партнёры</div>
+                <div id="partnersList" style="max-height: 400px; overflow-y: auto;">
+                    <!-- Partner list will be rendered here -->
+                </div>
+            `, `
+                <button type="button" class="btn btn-secondary" onclick="closeModal('partnersModal')">Закрыть</button>
+            `);
+
             // Monthly Expense Modal
             container.innerHTML += createModal('monthExpModal', '<span id="monthExpTitle">Расход месяца</span>', `
                 <form id="monthExpForm">
@@ -5452,14 +5506,17 @@
             const form = document.getElementById('dealForm');
             form.reset();
             document.getElementById('dealId').value = '';
-            
+
             // Reset payment status buttons
             document.getElementById('paymentReceived').classList.remove('active');
             document.getElementById('paymentScheduled').classList.remove('active');
             document.getElementById('dealPaymentStatus').value = '';
             document.getElementById('paymentStatusPreview').style.display = 'none';
             document.getElementById('paymentDateRequired').style.display = 'none';
-            
+
+            // Reset partner select visibility
+            document.getElementById('partnerSelectGroup').style.display = 'none';
+
             if (id) {
                 const deal = state.deals.find(d => d.id === id);
                 if (deal) {
@@ -5479,7 +5536,14 @@
                     document.getElementById('dealNextStep').value = deal.nextStep || '';
                     document.getElementById('dealDate').value = deal.date || '';
                     document.getElementById('dealBlocker').value = deal.blocker || '';
-                    
+
+                    // Partner field
+                    if (deal.leadSource === 'partner') {
+                        document.getElementById('partnerSelectGroup').style.display = 'block';
+                        updatePartnerSelects();
+                        document.getElementById('dealPartnerName').value = deal.partner || '';
+                    }
+
                     // Payment fields
                     document.getElementById('dealReceivedAt').value = deal.receivedAt || deal.closedAt || '';
                     document.getElementById('dealPaymentAmount').value = deal.paymentAmount || '';
@@ -5495,7 +5559,7 @@
                 document.getElementById('dealTaxPct').value = 5;
                 // НЕ устанавливаем по умолчанию: commissionPct, brokerCommPct, ropPct
             }
-            
+
             calcDealPreview();
             updatePaymentPreview();
             openModal('dealModal');
@@ -5648,9 +5712,10 @@
                 await db.collection('settings').doc('main').set({
                     targets: state.targets,
                     cushion: state.cushion,
-                    brokers: updatedBrokers
+                    brokers: updatedBrokers,
+                    partners: state.partners
                 }, { merge: true });
-                
+
                 nameInput.value = '';
                 renderBrokersList();
                 setSyncStatus('');
@@ -5682,9 +5747,10 @@
                         await db.collection('settings').doc('main').set({
                             targets: state.targets,
                             cushion: state.cushion,
-                            brokers: updatedBrokers
+                            brokers: updatedBrokers,
+                            partners: state.partners
                         }, { merge: true });
-                        
+
                         renderBrokersList();
                         setSyncStatus('');
                     } catch (err) {
@@ -5696,7 +5762,200 @@
             );
         };
 
+        // Partners Management
+        window.openPartnersModal = () => {
+            renderPartnersList();
+            document.getElementById('newPartnerName').value = '';
+            openModal('partnersModal');
+        };
+
+        function renderPartnersList() {
+            const container = document.getElementById('partnersList');
+            const partners = state.partners || CONFIG.defaultPartners;
+
+            if (partners.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 20px; color: var(--text-secondary);">
+                        Нет партнёров. Добавьте первого партнёра выше.
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = partners.map((partner, index) => {
+                const deals = state.deals.filter(d => d.partner === partner);
+                const activeDeals = deals.filter(d => !['closed', 'lost'].includes(d.stage)).length;
+                const closedDeals = deals.filter(d => d.stage === 'closed').length;
+
+                return `
+                    <div class="broker-list-item" style="display: flex; align-items: center; justify-content: space-between; padding: 12px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); margin-bottom: 8px;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div class="broker-avatar" style="width: 36px; height: 36px; font-size: 12px; background: var(--kalinka-peach);">${getInitials(partner)}</div>
+                            <div>
+                                <div style="font-weight: 600; font-size: 13px;">${partner}</div>
+                                <div style="font-size: 11px; color: var(--text-secondary);">
+                                    ${activeDeals} активных · ${closedDeals} закрытых
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn-icon delete" onclick="removePartner('${partner}')" title="Удалить партнёра" ${deals.length > 0 ? 'style="opacity: 0.5;" title="Невозможно удалить: есть сделки"' : ''}>
+                            Del
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderPartners() {
+            const grid = document.getElementById('partnerGrid');
+            const partners = state.partners || CONFIG.defaultPartners;
+
+            if (partners.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1 / -1;">
+                        <div class="empty-state-icon"></div>
+                        <div class="empty-state-title">Нет партнёров</div>
+                        <div class="empty-state-text">Добавьте партнёров для отслеживания их показателей</div>
+                        <button class="empty-state-btn" onclick="openPartnersModal()">+ Добавить партнёра</button>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = partners.map(partner => {
+                const deals = state.deals.filter(d => d.partner === partner);
+                const active = deals.filter(d => !['closed', 'lost'].includes(d.stage)).length;
+                const closed = deals.filter(d => d.stage === 'closed').length;
+                const earned = deals.filter(d => d.stage === 'closed').reduce((sum, d) => sum + calculateDealFinancials(d).partnerPayout, 0);
+
+                return `
+                    <div class="broker-card">
+                        <div class="broker-header">
+                            <div class="broker-avatar" style="background: var(--kalinka-peach);">${getInitials(partner)}</div>
+                            <div>
+                                <div class="broker-name">${partner}</div>
+                                <div class="broker-role">Партнёр</div>
+                            </div>
+                        </div>
+                        <div class="broker-stats">
+                            <div class="broker-stat">
+                                <div class="broker-stat-value">${active}</div>
+                                <div class="broker-stat-label">Активных</div>
+                            </div>
+                            <div class="broker-stat">
+                                <div class="broker-stat-value">${closed}</div>
+                                <div class="broker-stat-label">Закрыто</div>
+                            </div>
+                            <div class="broker-stat">
+                                <div class="broker-stat-value" style="font-size: 12px; color: var(--kalinka-peach);">${formatTHB(earned)}</div>
+                                <div class="broker-stat-label">Выплачено</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        window.addPartner = async () => {
+            const nameInput = document.getElementById('newPartnerName');
+            const name = nameInput.value.trim();
+
+            if (!name) {
+                showToast('Введите название партнёра', 'warning');
+                return;
+            }
+
+            if ((state.partners || []).includes(name)) {
+                showToast('Партнёр с таким названием уже существует', 'warning');
+                return;
+            }
+
+            const updatedPartners = [...(state.partners || CONFIG.defaultPartners), name];
+
+            try {
+                setSyncStatus('syncing');
+                await db.collection('settings').doc('main').set({
+                    targets: state.targets,
+                    cushion: state.cushion,
+                    brokers: state.brokers,
+                    partners: updatedPartners
+                }, { merge: true });
+
+                nameInput.value = '';
+                renderPartnersList();
+                setSyncStatus('');
+            } catch (err) {
+                console.error('Error adding partner:', err);
+                showToast('Ошибка при добавлении партнёра', 'error');
+                setSyncStatus('offline');
+            }
+        };
+
+        window.removePartner = async (partnerName) => {
+            // Check if partner has any deals
+            const partnerDeals = state.deals.filter(d => d.partner === partnerName);
+
+            if (partnerDeals.length > 0) {
+                showToast(`Невозможно удалить партнёра "${partnerName}": у него есть ${partnerDeals.length} сделок. Сначала переназначьте или удалите сделки.`, 'warning');
+                return;
+            }
+
+            showConfirmDialog(
+                'Удалить партнёра?',
+                `Вы уверены, что хотите удалить партнёра "${partnerName}"?`,
+                '🤝',
+                async () => {
+                    const updatedPartners = (state.partners || CONFIG.defaultPartners).filter(p => p !== partnerName);
+
+                    try {
+                        setSyncStatus('syncing');
+                        await db.collection('settings').doc('main').set({
+                            targets: state.targets,
+                            cushion: state.cushion,
+                            brokers: state.brokers,
+                            partners: updatedPartners
+                        }, { merge: true });
+
+                        renderPartnersList();
+                        setSyncStatus('');
+                    } catch (err) {
+                        console.error('Error removing partner:', err);
+                        showToast('Ошибка при удалении партнёра', 'error');
+                        setSyncStatus('offline');
+                    }
+                }
+            );
+        };
+
+        // Update partner selects across the app
+        function updatePartnerSelects() {
+            const partners = state.partners || CONFIG.defaultPartners;
+            const partnerOptions = partners.map(p => `<option value="${p}">${p}</option>`).join('');
+
+            // Update deal form partner select
+            const dealPartnerSelect = document.getElementById('dealPartnerName');
+            if (dealPartnerSelect) {
+                const currentValue = dealPartnerSelect.value;
+                dealPartnerSelect.innerHTML = `<option value="">Выберите партнёра...</option>${partnerOptions}`;
+                if (currentValue && partners.includes(currentValue)) {
+                    dealPartnerSelect.value = currentValue;
+                }
+            }
+        }
+
         // Helpers
+        window.togglePartnerSelect = () => {
+            const leadSource = document.getElementById('dealLeadSource').value;
+            const partnerGroup = document.getElementById('partnerSelectGroup');
+            if (partnerGroup) {
+                partnerGroup.style.display = leadSource === 'partner' ? 'block' : 'none';
+            }
+            // Update partner options when showing
+            if (leadSource === 'partner') {
+                updatePartnerSelects();
+            }
+        };
+
         window.calcDealPreview = () => {
             const taxPctVal = parseFloat(document.getElementById('dealTaxPct').value) || 5;
             
@@ -5760,12 +6019,20 @@
                 // Validate required fields
                 const nameEl = document.getElementById('dealName');
                 const amountEl = document.getElementById('dealAmount');
+                const leadSource = document.getElementById('dealLeadSource').value;
+                const partnerName = document.getElementById('dealPartnerName').value;
+
                 if (!nameEl || !nameEl.value.trim()) {
                     showToast('Введите название сделки', 'warning');
                     return;
                 }
                 if (!amountEl || isNaN(parseFloat(amountEl.value))) {
                     showToast('Введите корректную сумму сделки', 'warning');
+                    return;
+                }
+                // Validate partner selection when lead source is partner
+                if (leadSource === 'partner' && !partnerName) {
+                    showToast('Выберите партнёра', 'warning');
                     return;
                 }
 
@@ -5775,7 +6042,8 @@
                     stage,
                     probability: parseInt(document.getElementById('dealProbability').value) || 50,
                     broker: document.getElementById('dealBroker').value,
-                    leadSource: document.getElementById('dealLeadSource').value,
+                    leadSource: leadSource,
+                    partner: leadSource === 'partner' ? partnerName : null,
                     brokerCommPct: parseFloat(document.getElementById('dealBrokerComm').value) || 0,
                     commissionPct: parseFloat(document.getElementById('dealCommPct').value) || 0,
                     cashBonus: parseFloat(document.getElementById('dealCashBonus').value) || 0,
