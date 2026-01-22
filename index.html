@@ -27,63 +27,64 @@
 
 <style>
         :root {
-            /* NEW LIGHT THEME - Backgrounds */
-            --bg-primary: #FAFBFC;
+            /* PREMIUM LIGHT THEME - Backgrounds */
+            --bg-primary: #F8F9FB;
             --bg-secondary: #FFFFFF;
-            --bg-surface: #F4F5F7;
+            --bg-surface: #F1F3F5;
             --bg-elevated: #FFFFFF;
-            --bg-hover: #F0F1F3;
-            --bg-active: #E8EAED;
+            --bg-hover: #ECEEF0;
+            --bg-active: #E4E6E9;
             /* Legacy aliases for compatibility */
             --bg-card: #FFFFFF;
-            --bg-card-hover: #F0F1F3;
+            --bg-card-hover: #FAFBFC;
             --bg-card-elevated: #FFFFFF;
 
-            /* Text - NOT pure black */
-            --text-primary: #1A1D21;
-            --text-secondary: #5E6C84;
-            --text-muted: #8993A4;
-            --text-disabled: #B3BAC5;
+            /* Text - Premium dark tones */
+            --text-primary: #0F172A;
+            --text-secondary: #475569;
+            --text-muted: #94A3B8;
+            --text-disabled: #CBD5E1;
 
-            /* Borders */
-            --border-light: #E5E8EB;
-            --border-default: #DFE1E6;
-            --border-strong: #C1C7D0;
+            /* Borders - Subtle and refined */
+            --border-light: #E2E8F0;
+            --border-default: #CBD5E1;
+            --border-strong: #94A3B8;
             /* Legacy aliases */
-            --border-color: #DFE1E6;
-            --border-color-strong: #C1C7D0;
+            --border-color: #E2E8F0;
+            --border-color-strong: #CBD5E1;
 
-            /* Brand Kalinka (preserved identity) */
-            --kalinka-blue: #1A3654;
-            --kalinka-blue-light: #2563EB;
+            /* Brand Kalinka - Premium navy palette */
+            --kalinka-blue: #0F2942;
+            --kalinka-blue-light: #1E40AF;
             --kalinka-blue-bg: #EFF6FF;
-            --kalinka-blue-dim: #EFF6FF;
-            --kalinka-red: #DC2626;
+            --kalinka-blue-dim: #F0F5FF;
+            --kalinka-red: #B91C1C;
             --kalinka-red-bright: #DC2626;
             --kalinka-red-bg: #FEF2F2;
-            --kalinka-red-dim: #FEF2F2;
-            --kalinka-peach: #D97706;
+            --kalinka-red-dim: #FFF5F5;
+            --kalinka-peach: #B45309;
             --kalinka-peach-dim: #FFFBEB;
 
-            /* Semantic Colors */
-            --accent-green: #059669;
+            /* Semantic Colors - Refined */
+            --accent-green: #047857;
             --accent-green-dim: #ECFDF5;
-            --success: #059669;
+            --success: #047857;
             --success-bg: #ECFDF5;
-            --warning: #D97706;
+            --warning: #B45309;
             --warning-bg: #FFFBEB;
-            --error: #DC2626;
+            --error: #B91C1C;
             --error-bg: #FEF2F2;
 
-            /* Shadows (replacing glow effects) */
-            --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
-            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
-            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
-            --shadow-focus: 0 0 0 3px rgba(37, 99, 235, 0.15);
+            /* Premium Shadows - Soft and layered */
+            --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+            --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+            --shadow-md: 0 4px 8px rgba(15, 23, 42, 0.06), 0 2px 4px rgba(15, 23, 42, 0.04);
+            --shadow-lg: 0 12px 24px rgba(15, 23, 42, 0.08), 0 4px 8px rgba(15, 23, 42, 0.04);
+            --shadow-xl: 0 20px 40px rgba(15, 23, 42, 0.1), 0 8px 16px rgba(15, 23, 42, 0.06);
+            --shadow-focus: 0 0 0 3px rgba(30, 64, 175, 0.12);
             /* Legacy aliases */
-            --shadow-soft: 0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.06);
-            --shadow-glow-blue: 0 0 0 3px rgba(37, 99, 235, 0.15);
+            --shadow-soft: 0 4px 8px rgba(15, 23, 42, 0.06), 0 2px 4px rgba(15, 23, 42, 0.04);
+            --shadow-glow-blue: 0 0 0 3px rgba(30, 64, 175, 0.12);
             --glass-bg: #FFFFFF;
 
             /* Unified spacing system */
@@ -227,21 +228,21 @@
         }
 
         .login-logo {
-            width: 72px;
-            height: 72px;
-            background: var(--kalinka-blue);
-            border-radius: var(--radius-md);
+            width: 88px;
+            height: 88px;
+            background: transparent;
+            border-radius: var(--radius-lg);
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 24px;
-            box-shadow: var(--shadow-md);
+            margin: 0 auto 32px;
         }
 
         .login-logo img {
-            width: 90%;
-            height: 90%;
+            width: 100%;
+            height: 100%;
             object-fit: contain;
+            filter: drop-shadow(0 4px 16px rgba(26, 54, 84, 0.12));
         }
 
         .login-title {
@@ -434,9 +435,11 @@
             position: sticky;
             top: 0;
             z-index: 100;
-            background: var(--bg-secondary);
-            border-bottom: 1px solid var(--border-light);
-            box-shadow: var(--shadow-xs);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
         }
 
         .header-content {
@@ -457,26 +460,27 @@
         }
 
         .logo {
-            width: 40px;
-            height: 40px;
-            background: var(--kalinka-blue);
-            border-radius: var(--radius-sm);
+            width: 44px;
+            height: 44px;
+            background: transparent;
+            border-radius: var(--radius-md);
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: var(--shadow-sm);
         }
 
         .logo img {
-            width: 85%;
-            height: 85%;
+            width: 100%;
+            height: 100%;
             object-fit: contain;
+            filter: drop-shadow(0 2px 8px rgba(26, 54, 84, 0.1));
         }
 
         .header-title {
-            font-size: var(--text-lg);
-            font-weight: var(--font-bold);
+            font-size: 18px;
+            font-weight: 600;
             color: var(--text-primary);
+            letter-spacing: -0.02em;
         }
 
         /* Period Selector */
@@ -685,16 +689,17 @@
         }
 
         .tab-btn {
-            padding: var(--space-3) var(--space-4);
+            padding: 14px 20px;
             background: transparent;
             border: none;
             border-bottom: 2px solid transparent;
             color: var(--text-secondary);
             font-family: inherit;
-            font-size: var(--text-base);
-            font-weight: var(--font-medium);
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: -0.01em;
             cursor: pointer;
-            transition: all 0.15s ease;
+            transition: all 0.2s ease;
             white-space: nowrap;
             display: flex;
             align-items: center;
@@ -704,6 +709,7 @@
 
         .tab-btn:hover {
             color: var(--text-primary);
+            background: rgba(15, 41, 66, 0.03);
         }
 
         .tab-btn.active {
@@ -729,16 +735,17 @@
         /* Section Cards - Clean minimalist style */
         .section-card {
             background: var(--bg-secondary);
-            border: 1px solid var(--border-default);
-            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-light);
+            border-radius: 16px;
             margin-bottom: var(--space-lg);
             overflow: hidden;
-            box-shadow: var(--shadow-sm);
-            transition: box-shadow 0.2s ease;
+            box-shadow: var(--shadow-md);
+            transition: all 0.25s ease;
         }
 
         .section-card:hover {
-            box-shadow: var(--shadow-md);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--border-default);
         }
 
         .section-header {
@@ -758,13 +765,16 @@
         }
 
         .section-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: var(--radius-md);
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 14px;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            text-transform: uppercase;
         }
 
         .section-icon.blue { background: var(--kalinka-blue-bg); color: var(--kalinka-blue); }
@@ -969,14 +979,15 @@
 
         /* Primary Button */
         .btn-primary {
-            background: var(--kalinka-blue);
+            background: linear-gradient(135deg, var(--kalinka-blue) 0%, #0c1f33 100%);
             color: white;
+            box-shadow: 0 2px 4px rgba(15, 41, 66, 0.2);
         }
 
         .btn-primary:hover {
-            background: #15294a;
+            background: linear-gradient(135deg, #0c1f33 0%, var(--kalinka-blue) 100%);
             transform: translateY(-1px);
-            box-shadow: var(--shadow-md);
+            box-shadow: 0 4px 12px rgba(15, 41, 66, 0.25);
         }
 
         .btn-primary:active {
@@ -2871,11 +2882,11 @@
     <!-- Setup Screen (shown if Firebase not configured) -->
     <div class="setup-screen" id="setupScreen">
         <div class="setup-card">
-            <h2 class="setup-title">⚙️ Настройка Firebase</h2>
+            <h2 class="setup-title">Настройка Firebase</h2>
             <p class="setup-subtitle">Для работы системы необходимо настроить Firebase</p>
             
             <div class="setup-warning">
-                <strong>⚠️ Firebase не настроен!</strong><br>
+                <strong>Firebase не настроен!</strong><br>
                 Следуйте инструкции в README.md для настройки облачной базы данных.
             </div>
 
@@ -2969,11 +2980,11 @@
         <main class="main-content" id="main-content" role="main">
             <!-- Tabs with ARIA -->
             <div class="tabs-nav" role="tablist" aria-label="Разделы дашборда">
-                <button class="tab-btn active" data-tab="overview" role="tab" aria-selected="true" aria-controls="tab-overview" id="tab-btn-overview">📊 Обзор</button>
-                <button class="tab-btn" data-tab="deals" role="tab" aria-selected="false" aria-controls="tab-deals" id="tab-btn-deals">🎯 Сделки</button>
-                <button class="tab-btn" data-tab="finance" role="tab" aria-selected="false" aria-controls="tab-finance" id="tab-btn-finance">💰 Финансы</button>
-                <button class="tab-btn" data-tab="planning" role="tab" aria-selected="false" aria-controls="tab-planning" id="tab-btn-planning">📈 План/Факт</button>
-                <button class="tab-btn" data-tab="team" role="tab" aria-selected="false" aria-controls="tab-team" id="tab-btn-team">👥 Команда</button>
+                <button class="tab-btn active" data-tab="overview" role="tab" aria-selected="true" aria-controls="tab-overview" id="tab-btn-overview">Обзор</button>
+                <button class="tab-btn" data-tab="deals" role="tab" aria-selected="false" aria-controls="tab-deals" id="tab-btn-deals">Сделки</button>
+                <button class="tab-btn" data-tab="finance" role="tab" aria-selected="false" aria-controls="tab-finance" id="tab-btn-finance">Финансы</button>
+                <button class="tab-btn" data-tab="planning" role="tab" aria-selected="false" aria-controls="tab-planning" id="tab-btn-planning">План/Факт</button>
+                <button class="tab-btn" data-tab="team" role="tab" aria-selected="false" aria-controls="tab-team" id="tab-btn-team">Команда</button>
             </div>
 
             <!-- Tab: Overview -->
@@ -3005,7 +3016,7 @@
                 <div class="section-card">
                     <div class="section-header">
                         <div class="section-header-left">
-                            <div class="section-icon peach">🎯</div>
+                            <div class="section-icon peach">T</div>
                             <div>
                                 <div class="section-title">Топ-3 сделки для закрытия</div>
                                 <div class="section-subtitle">Период: <span id="topDealsperiod"></span></div>
@@ -3041,7 +3052,7 @@
                 <div class="section-card">
                     <div class="section-header">
                         <div class="section-header-left">
-                            <div class="section-icon green">📋</div>
+                            <div class="section-icon green">S</div>
                             <div>
                                 <div class="section-title">Сделки</div>
                                 <div class="section-subtitle" id="dealsSubtitle">Период</div>
@@ -3053,7 +3064,7 @@
                         <!-- Search and Filter Bar -->
                         <div class="filter-bar">
                             <div class="search-wrapper">
-                                <span class="search-icon">🔍</span>
+                                <span class="search-icon"></span>
                                 <input type="text" class="search-input" id="dealsSearch" placeholder="Поиск по названию или брокеру..." oninput="filterDeals()">
                             </div>
                             <select class="filter-select" id="dealsStageFilter" onchange="filterDeals()">
@@ -3062,7 +3073,7 @@
                                 <option value="negotiation">Переговоры</option>
                                 <option value="contract">Контракт</option>
                                 <option value="closing">Закрытие</option>
-                                <option value="closed">Закрыто ✓</option>
+                                <option value="closed">Закрыто</option>
                                 <option value="lost">Потеряно</option>
                             </select>
                             <select class="filter-select" id="dealsBrokerFilter" onchange="filterDeals()">
@@ -3117,24 +3128,24 @@
                 <!-- P&L KPI Cards -->
                 <div class="pnl-kpi-grid">
                     <div class="pnl-kpi-card income">
-                        <div class="pnl-kpi-label">📈 Доходы</div>
+                        <div class="pnl-kpi-label">Доходы</div>
                         <div class="pnl-kpi-value" id="pnlTotalIncome">฿0</div>
                         <div class="pnl-kpi-trend" id="pnlIncomeTrend">
                             <span id="pnlScheduledIncome" style="font-size: 10px; color: var(--kalinka-peach);">Запланировано: ฿0</span>
                         </div>
                     </div>
                     <div class="pnl-kpi-card expense">
-                        <div class="pnl-kpi-label">📉 Расходы</div>
+                        <div class="pnl-kpi-label">Расходы</div>
                         <div class="pnl-kpi-value" id="pnlTotalExpense">฿0</div>
                         <div class="pnl-kpi-trend" id="pnlExpenseTrend"></div>
                     </div>
                     <div class="pnl-kpi-card profit">
-                        <div class="pnl-kpi-label">💰 Валовая прибыль</div>
+                        <div class="pnl-kpi-label">Валовая прибыль</div>
                         <div class="pnl-kpi-value" id="pnlTotalProfit">฿0</div>
                         <div class="pnl-kpi-trend" id="pnlProfitTrend"></div>
                     </div>
                     <div class="pnl-kpi-card margin">
-                        <div class="pnl-kpi-label">📊 Profit Margin</div>
+                        <div class="pnl-kpi-label">Profit Margin</div>
                         <div class="pnl-kpi-value" id="pnlProfitMargin">0%</div>
                         <div class="pnl-kpi-trend" id="pnlMarginTrend"></div>
                     </div>
@@ -3143,7 +3154,7 @@
                 <!-- Charts -->
                 <div class="pnl-charts-grid">
                     <div class="pnl-chart-card">
-                        <div class="pnl-chart-title">📊 Динамика доходов и расходов</div>
+                        <div class="pnl-chart-title">Динамика доходов и расходов</div>
                         <div class="pnl-chart-container">
                             <canvas id="pnlLineChart"></canvas>
                         </div>
@@ -3154,7 +3165,7 @@
                         </div>
                     </div>
                     <div class="pnl-chart-card">
-                        <div class="pnl-chart-title">🍩 Структура расходов</div>
+                        <div class="pnl-chart-title">Структура расходов</div>
                         <div class="pnl-chart-container">
                             <canvas id="pnlDonutChart"></canvas>
                         </div>
@@ -3165,7 +3176,7 @@
                 <div class="section-card" style="margin-bottom: 20px;">
                     <div class="section-header">
                         <div class="section-header-left">
-                            <div class="section-icon green">👥</div>
+                            <div class="section-icon green">B</div>
                             <div>
                                 <div class="section-title">Доходы по брокерам</div>
                                 <div class="section-subtitle">За выбранный период</div>
@@ -3183,7 +3194,7 @@
                 <div class="section-card">
                     <div class="section-header">
                         <div class="section-header-left">
-                            <div class="section-icon peach">📋</div>
+                            <div class="section-icon peach">C</div>
                             <div>
                                 <div class="section-title">P&L по периодам</div>
                                 <div class="section-subtitle" id="pnlTableSubtitle">Детализация</div>
@@ -3216,7 +3227,7 @@
                 <div class="section-card">
                     <div class="section-header">
                         <div class="section-header-left">
-                            <div class="section-icon peach">📊</div>
+                            <div class="section-icon peach">A</div>
                             <div>
                                 <div class="section-title">Детализация чистого дохода</div>
                                 <div class="section-subtitle" id="financeSubtitle">Период</div>
@@ -3257,7 +3268,7 @@
                     </div>
                     <div class="section-body">
                         <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px; padding: 14px; background: var(--accent-green-dim); border-radius: var(--radius-md);">
-                            <span style="font-size: 20px;">🛡️</span>
+                            <span style="font-size: 14px; font-weight: 600;">S</span>
                             <div>
                                 <div style="font-size: 11px; color: var(--text-secondary);">Подушка безопасности</div>
                                 <div style="font-size: 18px; font-weight: 700; font-family: 'JetBrains Mono', monospace;" id="cushionValue">฿0</div>
@@ -3276,7 +3287,7 @@
                 <div class="section-card">
                     <div class="section-header">
                         <div class="section-header-left">
-                            <div class="section-icon red">⚠️</div>
+                            <div class="section-icon red">R</div>
                             <div>
                                 <div class="section-title">Риски</div>
                             </div>
@@ -3308,7 +3319,7 @@
                 <div class="section-card">
                     <div class="section-header">
                         <div class="section-header-left">
-                            <div class="section-icon blue">🎯</div>
+                            <div class="section-icon blue">P</div>
                             <div>
                                 <div class="section-title">Годовой план <span id="planYear">2024</span></div>
                                 <div class="section-subtitle">Target Revenue</div>
@@ -3320,7 +3331,7 @@
                         <div class="kpi-grid">
                             <div class="kpi-card">
                                 <div class="kpi-header">
-                                    <div class="kpi-icon" style="background: var(--kalinka-blue-dim)">🎯</div>
+                                    <div class="kpi-icon" style="background: var(--kalinka-blue-dim)"></div>
                                 </div>
                                 <div class="kpi-value" id="annualTarget">฿0</div>
                                 <div class="kpi-label">Годовой план</div>
@@ -3334,14 +3345,14 @@
                             </div>
                             <div class="kpi-card">
                                 <div class="kpi-header">
-                                    <div class="kpi-icon" style="background: var(--kalinka-peach-dim)">📊</div>
+                                    <div class="kpi-icon" style="background: var(--kalinka-peach-dim)"></div>
                                 </div>
                                 <div class="kpi-value" id="annualPercent">0%</div>
                                 <div class="kpi-label">Выполнение</div>
                             </div>
                             <div class="kpi-card">
                                 <div class="kpi-header">
-                                    <div class="kpi-icon" style="background: var(--kalinka-blue-dim)">📈</div>
+                                    <div class="kpi-icon" style="background: var(--kalinka-blue-dim)"></div>
                                 </div>
                                 <div class="kpi-value" id="annualForecast">฿0</div>
                                 <div class="kpi-label">Прогноз года</div>
@@ -3354,7 +3365,7 @@
                 <div class="section-card">
                     <div class="section-header">
                         <div class="section-header-left">
-                            <div class="section-icon green">📈</div>
+                            <div class="section-icon green">G</div>
                             <div>
                                 <div class="section-title">План vs Факт по месяцам</div>
                                 <div class="section-subtitle">Наведите на столбец для деталей</div>
@@ -3390,7 +3401,7 @@
                 <div class="section-card">
                     <div class="section-header">
                         <div class="section-header-left">
-                            <div class="section-icon peach">📋</div>
+                            <div class="section-icon peach">C</div>
                             <div>
                                 <div class="section-title">Детализация по месяцам</div>
                             </div>
@@ -3421,13 +3432,13 @@
                 <div class="section-card">
                     <div class="section-header">
                         <div class="section-header-left">
-                            <div class="section-icon blue">👥</div>
+                            <div class="section-icon blue">K</div>
                             <div>
                                 <div class="section-title">Дашборд брокеров</div>
                                 <div class="section-subtitle">Управление командой</div>
                             </div>
                         </div>
-                        <button class="btn btn-primary btn-sm" onclick="openBrokersModal()">⚙️ Управление</button>
+                        <button class="btn btn-primary btn-sm" onclick="openBrokersModal()">Управление</button>
                     </div>
                     <div class="section-body">
                         <div class="broker-grid" id="brokerGrid"></div>
@@ -3443,7 +3454,7 @@
     <!-- Confirm Dialog -->
     <div class="confirm-dialog" id="confirmDialog">
         <div class="confirm-dialog-box">
-            <div class="confirm-dialog-icon" id="confirmIcon">⚠️</div>
+            <div class="confirm-dialog-icon" id="confirmIcon">!</div>
             <h3 class="confirm-dialog-title" id="confirmTitle">Подтвердите действие</h3>
             <p class="confirm-dialog-text" id="confirmText">Вы уверены, что хотите выполнить это действие?</p>
             <div class="confirm-dialog-buttons">
@@ -3482,11 +3493,11 @@
                 'Valeria Dramma', 'Tomazs Rozmus', 'Veronika Pfneiszl'
             ],
             expenseCategories: {
-                rent: { name: 'Аренда', icon: '🏢' },
-                salary: { name: 'ФОТ', icon: '💼' },
-                operations: { name: 'Операционные', icon: '⚙️' },
-                marketing: { name: 'Маркетинг', icon: '📣' },
-                other: { name: 'Прочие', icon: '📦' }
+                rent: { name: 'Аренда', icon: '' },
+                salary: { name: 'ФОТ', icon: '' },
+                operations: { name: 'Операционные', icon: '' },
+                marketing: { name: 'Маркетинг', icon: '' },
+                other: { name: 'Прочие', icon: '' }
             },
             months: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 
                      'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
@@ -4163,9 +4174,9 @@
             if (!container) return;
 
             const icons = {
-                success: '✓',
+                success: '',
                 error: '✕',
-                warning: '⚠',
+                warning: '!',
                 info: 'ℹ'
             };
 
@@ -4226,7 +4237,7 @@
             showConfirmDialog(
                 'Удалить сделку?',
                 `Вы уверены, что хотите удалить "${dealName}"? Это действие нельзя отменить.`,
-                '🗑️',
+                'Del',
                 async () => {
                     setSyncStatus('syncing');
                     try {
@@ -4379,7 +4390,7 @@
             showConfirmDialog(
                 'Удалить риск?',
                 'Вы уверены, что хотите удалить этот риск?',
-                '⚠️',
+                '!',
                 async () => {
                     setSyncStatus('syncing');
                     try {
@@ -4456,15 +4467,15 @@
             document.getElementById('overviewKPIs').innerHTML = `
                 <div class="kpi-card">
                     <div class="kpi-header">
-                        <div class="kpi-icon" style="background: var(--accent-green-dim)">📈</div>
-                        <span class="kpi-trend ${coverage >= 90 ? 'up' : 'down'}">${coverage >= 90 ? '✓' : '!'}</span>
+                        <div class="kpi-icon" style="background: var(--accent-green-dim)"></div>
+                        <span class="kpi-trend ${coverage >= 90 ? 'up' : 'down'}">${coverage >= 90 ? '+' : '-'}</span>
                     </div>
                     <div class="kpi-value">${Math.round(coverage)}%</div>
                     <div class="kpi-label">Next Step Coverage (цель ≥90%)</div>
                 </div>
                 <div class="kpi-card">
                     <div class="kpi-header">
-                        <div class="kpi-icon" style="background: var(--kalinka-blue-dim)">🎯</div>
+                        <div class="kpi-icon" style="background: var(--kalinka-blue-dim)"></div>
                     </div>
                     <div class="kpi-value">${activeDeals.length}</div>
                     <div class="kpi-label">Активных сделок</div>
@@ -4478,7 +4489,7 @@
                 </div>
                 <div class="kpi-card">
                     <div class="kpi-header">
-                        <div class="kpi-icon" style="background: var(--kalinka-peach-dim)">💰</div>
+                        <div class="kpi-icon" style="background: var(--kalinka-peach-dim)"></div>
                     </div>
                     <div class="kpi-value" style="font-size: 18px;">${formatTHB(pipeline)}</div>
                     <div class="kpi-label">Pipeline Value</div>
@@ -4550,7 +4561,7 @@
                 <div class="kpi-card"><div class="kpi-value">${counts.negotiation}</div><div class="kpi-label">Переговоры</div></div>
                 <div class="kpi-card"><div class="kpi-value">${counts.contract}</div><div class="kpi-label">Контракт</div></div>
                 <div class="kpi-card"><div class="kpi-value">${counts.closing}</div><div class="kpi-label">Закрытие</div></div>
-                <div class="kpi-card"><div class="kpi-value" style="color: var(--accent-green);">${counts.closed}</div><div class="kpi-label">Закрыто ✓</div></div>
+                <div class="kpi-card"><div class="kpi-value" style="color: var(--accent-green);">${counts.closed}</div><div class="kpi-label">Закрыто</div></div>
             `;
 
             // Apply filters
@@ -4597,7 +4608,7 @@
                 tbody.innerHTML = `
                     <tr><td colspan="10">
                         <div class="empty-state">
-                            <div class="empty-state-icon">${hasFilters ? '🔍' : '📋'}</div>
+                            <div class="empty-state-icon">${hasFilters ? '' : ''}</div>
                             <div class="empty-state-title">${hasFilters ? 'Ничего не найдено' : 'Нет сделок'}</div>
                             <div class="empty-state-text">${hasFilters ? 'Попробуйте изменить параметры поиска' : 'Создайте первую сделку чтобы начать отслеживать pipeline'}</div>
                             ${!hasFilters ? '<button class="empty-state-btn" onclick="openDealModal()">+ Добавить сделку</button>' : ''}
@@ -4607,7 +4618,7 @@
                 return;
             }
 
-            const stageLabels = { lead: 'Лид', negotiation: 'Переговоры', contract: 'Контракт', closing: 'Закрытие', closed: 'Закрыто ✓', lost: 'Потеряно' };
+            const stageLabels = { lead: 'Лид', negotiation: 'Переговоры', contract: 'Контракт', closing: 'Закрытие', closed: 'Закрыто', lost: 'Потеряно' };
             const sourceLabels = { company: 'Компания', partner: 'Партнёр', own: 'Свой лид' };
 
             tbody.innerHTML = deals.map(d => {
@@ -4638,8 +4649,8 @@
                         <td class="mono ${calc.companyProfit >= 0 ? 'amount' : 'amount-negative'}">${formatTHB(calc.companyProfit)}${paymentStatusHtml}</td>
                         <td>
                             <div style="display: flex; gap: 4px;">
-                                <button class="btn-icon" onclick="openDealModal('${d.id}')" aria-label="Редактировать ${d.name}">✏️</button>
-                                <button class="btn-icon delete" onclick="deleteDeal('${d.id}')" aria-label="Удалить ${d.name}">🗑️</button>
+                                <button class="btn-icon" onclick="openDealModal('${d.id}')" aria-label="Редактировать ${d.name}">Edit</button>
+                                <button class="btn-icon delete" onclick="deleteDeal('${d.id}')" aria-label="Удалить ${d.name}">Del</button>
                             </div>
                         </td>
                     </tr>
@@ -4721,7 +4732,7 @@
 
             let total = 0;
             const accordionHtml = Object.entries(categories).map(([cat, data]) => {
-                const info = CONFIG.expenseCategories[cat] || { name: cat, icon: '📦' };
+                const info = CONFIG.expenseCategories[cat] || { name: cat, icon: '' };
                 total += data.total;
                 return `
                     <div class="accordion-item">
@@ -4743,9 +4754,9 @@
                                                     <td class="mono">${formatTHB(e.isMonthly ? e.amount : e.calcAmount)}</td>
                                                     <td>${e.isMonthly ? 'факт' : (e.period === 'monthly' ? '/мес' : '/нед')}</td>
                                                     <td>${monthDetails.isCustom ? `
-                                                        <button class="btn-icon" onclick="editMonthExp('${currentPeriodKey}','${e.id}')">✏️</button>
-                                                        <button class="btn-icon delete" onclick="delMonthExp('${currentPeriodKey}','${e.id}')">🗑️</button>
-                                                    ` : `<button class="btn-icon delete" onclick="deleteExpense('${e.id}')">🗑️</button>`}</td>
+                                                        <button class="btn-icon" onclick="editMonthExp('${currentPeriodKey}','${e.id}')">Edit</button>
+                                                        <button class="btn-icon delete" onclick="delMonthExp('${currentPeriodKey}','${e.id}')">Del</button>
+                                                    ` : `<button class="btn-icon delete" onclick="deleteExpense('${e.id}')">Del</button>`}</td>
                                                 </tr>
                                             `).join('')}
                                         </tbody>
@@ -4761,14 +4772,14 @@
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:${monthDetails.isCustom ? 'var(--kalinka-blue-dim)' : 'var(--bg-secondary)'};border-radius:var(--radius-md);margin-bottom:12px;border:1px solid ${monthDetails.isCustom ? 'var(--kalinka-blue)' : 'var(--border-color)'};">
                     <div>
                         <div style="font-size:13px;font-weight:600;">${periodLabel}</div>
-                        <div style="font-size:11px;color:var(--text-secondary);">${monthDetails.isCustom ? '📝 Корректировки' : '📋 Базовые расходы'}</div>
+                        <div style="font-size:11px;color:var(--text-secondary);">${monthDetails.isCustom ? 'Корректировки' : 'Базовые расходы'}</div>
                     </div>
                     <div style="display:flex;gap:8px;">
                         ${!monthDetails.isCustom ? `
-                            <button class="btn btn-primary btn-sm" onclick="startMonthEdit('${currentPeriodKey}')">✏️ Корректировать</button>
+                            <button class="btn btn-primary btn-sm" onclick="startMonthEdit('${currentPeriodKey}')">Edit Корректировать</button>
                         ` : `
                             <button class="btn btn-secondary btn-sm" onclick="addMonthExp('${currentPeriodKey}')">+ Добавить</button>
-                            <button class="btn btn-secondary btn-sm" onclick="resetMonth('${currentPeriodKey}')">🔄 Сбросить</button>
+                            <button class="btn btn-secondary btn-sm" onclick="resetMonth('${currentPeriodKey}')">Сбросить</button>
                         `}
                     </div>
                 </div>
@@ -4872,8 +4883,8 @@
                     <td style="color: ${r.execution ? 'var(--text-primary)' : 'var(--text-muted)'};">${r.execution || '—'}</td>
                     <td>
                         <div style="display: flex; gap: 4px;">
-                            <button class="btn-icon" onclick="openRiskModal('${r.id}')">✏️</button>
-                            <button class="btn-icon delete" onclick="deleteRisk('${r.id}')">🗑️</button>
+                            <button class="btn-icon" onclick="openRiskModal('${r.id}')">Edit</button>
+                            <button class="btn-icon delete" onclick="deleteRisk('${r.id}')">Del</button>
                         </div>
                     </td>
                 </tr>
@@ -5001,7 +5012,7 @@
             if (brokers.length === 0) {
                 grid.innerHTML = `
                     <div class="empty-state" style="grid-column: 1 / -1;">
-                        <div class="empty-state-icon">👥</div>
+                        <div class="empty-state-icon"></div>
                         <div class="empty-state-title">Нет брокеров</div>
                         <div class="empty-state-text">Добавьте брокеров для отслеживания их показателей</div>
                         <button class="empty-state-btn" onclick="openBrokersModal()">+ Добавить брокера</button>
@@ -5184,7 +5195,7 @@
                                 <option value="negotiation">Переговоры</option>
                                 <option value="contract">Контракт</option>
                                 <option value="closing">Закрытие</option>
-                                <option value="closed">Закрыто ✓</option>
+                                <option value="closed">Закрыто</option>
                                 <option value="lost">Потеряно</option>
                             </select>
                         </div>
@@ -5279,7 +5290,7 @@
                     </div>
                     
                     <div class="form-divider"></div>
-                    <div class="form-section-title">💰 Платежи / Поступления</div>
+                    <div class="form-section-title">Платежи / Поступления</div>
                     <div class="payment-info-block">
                         <div class="income-type-toggle">
                             <button type="button" class="income-type-btn" id="paymentReceived" onclick="setPaymentStatus('received')">
@@ -5541,7 +5552,7 @@
             
             if (status === 'received') {
                 if (isFuture) {
-                    previewText.innerHTML = `<span style="color: var(--kalinka-peach);">⚠️ Дата в будущем - доход будет учтён как фактический в период ${formatDate(receivedAt)}</span>`;
+                    previewText.innerHTML = `<span style="color: var(--kalinka-peach);">Дата в будущем - доход будет учтён как фактический в период ${formatDate(receivedAt)}</span>`;
                 } else {
                     previewText.innerHTML = `<span style="color: var(--accent-green);">✅ Фактический доход учтён в P&L за ${formatDate(receivedAt)}</span>`;
                 }
@@ -5626,7 +5637,7 @@
                             </div>
                         </div>
                         <button class="btn-icon delete" onclick="removeBroker('${broker}')" title="Удалить брокера" ${deals.length > 0 ? 'style="opacity: 0.5;" title="Невозможно удалить: есть сделки"' : ''}>
-                            🗑️
+                            Del
                         </button>
                     </div>
                 `;
