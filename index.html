@@ -4454,11 +4454,8 @@
 
             document.getElementById('overviewKPIs').innerHTML = `
                 <div class="kpi-card">
-                    <div class="kpi-header">
-                        <span class="kpi-trend ${coverage >= 90 ? 'up' : 'down'}">${coverage >= 90 ? '+' : '-'}</span>
-                    </div>
                     <div class="kpi-value">${Math.round(coverage)}%</div>
-                    <div class="kpi-label">Next Step Coverage (цель ≥90%)</div>
+                    <div class="kpi-label">Охват планированием (цель ≥90%)</div>
                 </div>
                 <div class="kpi-card">
                     <div class="kpi-value">${activeDeals.length}</div>
