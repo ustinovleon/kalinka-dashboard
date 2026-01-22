@@ -2690,6 +2690,10 @@
 
         const showError = (msg) => {
             const el = document.getElementById('authError');
+            if (!el) {
+                console.error('Auth error element not found:', msg);
+                return;
+            }
             el.textContent = msg;
             el.classList.add('show');
             setTimeout(() => el.classList.remove('show'), 5000);
@@ -2697,6 +2701,10 @@
 
         const showSuccess = (msg) => {
             const el = document.getElementById('authSuccess');
+            if (!el) {
+                console.log('Auth success element not found:', msg);
+                return;
+            }
             el.textContent = msg;
             el.classList.add('show');
             setTimeout(() => el.classList.remove('show'), 3000);
@@ -2705,10 +2713,60 @@
         const setSyncStatus = (status) => {
             const dot = document.getElementById('syncDot');
             const text = document.getElementById('syncText');
+            if (!dot || !text) {
+                console.warn('Sync status elements not found');
+                return;
+            }
             dot.className = 'sync-dot ' + status;
-            text.textContent = status === 'syncing' ? 'Синхронизация...' : 
+            text.textContent = status === 'syncing' ? 'Синхронизация...' :
                               status === 'offline' ? 'Оффлайн' : 'Синхронизировано';
         };
+
+        // =============================================
+        // VALIDATION HELPERS
+        // =============================================
+        const validateRequired = (value, fieldName) => {
+            if (value === null || value === undefined || String(value).trim() === '') {
+                throw new Error(`Поле "${fieldName}" обязательно для заполнения`);
+            }
+            return true;
+        };
+
+        const validateNumber = (value, fieldName, options = {}) => {
+            const num = parseFloat(value);
+            if (isNaN(num)) {
+                throw new Error(`Поле "${fieldName}" должно быть числом`);
+            }
+            if (options.min !== undefined && num < options.min) {
+                throw new Error(`Поле "${fieldName}" не может быть меньше ${options.min}`);
+            }
+            if (options.max !== undefined && num > options.max) {
+                throw new Error(`Поле "${fieldName}" не может быть больше ${options.max}`);
+            }
+            return num;
+        };
+
+        const safeParseFloat = (value, defaultValue = 0) => {
+            const num = parseFloat(value);
+            return isNaN(num) ? defaultValue : num;
+        };
+
+        const safeParseInt = (value, defaultValue = 0) => {
+            const num = parseInt(value, 10);
+            return isNaN(num) ? defaultValue : num;
+        };
+
+        // =============================================
+        // GLOBAL ERROR HANDLERS
+        // =============================================
+        window.addEventListener('unhandledrejection', (event) => {
+            console.error('Unhandled promise rejection:', event.reason);
+            setSyncStatus('offline');
+        });
+
+        window.addEventListener('error', (event) => {
+            console.error('Global error:', event.error);
+        });
 
         // =============================================
         // FINANCIAL CALCULATIONS
@@ -2910,28 +2968,41 @@
         // =============================================
         function setupAuth() {
             auth.onAuthStateChanged(async (user) => {
-                document.getElementById('loadingScreen').classList.add('hidden');
-                
+                const loadingScreen = document.getElementById('loadingScreen');
+                if (loadingScreen) loadingScreen.classList.add('hidden');
+
                 if (user) {
                     currentUser = user;
-                    
-                    // Get user profile
-                    const userDoc = await db.collection('users').doc(user.uid).get();
-                    const userData = userDoc.exists ? userDoc.data() : { name: user.email, role: 'user' };
-                    
-                    document.getElementById('userName').textContent = userData.name || user.email;
-                    document.getElementById('userRole').textContent = userData.role || 'user';
-                    document.getElementById('userAvatar').textContent = getInitials(userData.name || user.email);
-                    
-                    document.getElementById('loginScreen').classList.add('hidden');
-                    document.getElementById('dashboard').classList.add('visible');
-                    
-                    setupRealtimeListeners();
-                    updatePeriodDisplay();
+
+                    try {
+                        // Get user profile
+                        const userDoc = await db.collection('users').doc(user.uid).get();
+                        const userData = userDoc.exists ? userDoc.data() : { name: user.email, role: 'user' };
+
+                        const userNameEl = document.getElementById('userName');
+                        const userRoleEl = document.getElementById('userRole');
+                        const userAvatarEl = document.getElementById('userAvatar');
+                        if (userNameEl) userNameEl.textContent = userData.name || user.email;
+                        if (userRoleEl) userRoleEl.textContent = userData.role || 'user';
+                        if (userAvatarEl) userAvatarEl.textContent = getInitials(userData.name || user.email);
+
+                        const loginScreen = document.getElementById('loginScreen');
+                        const dashboard = document.getElementById('dashboard');
+                        if (loginScreen) loginScreen.classList.add('hidden');
+                        if (dashboard) dashboard.classList.add('visible');
+
+                        setupRealtimeListeners();
+                        updatePeriodDisplay();
+                    } catch (err) {
+                        console.error('Error loading user profile:', err);
+                        showError('Ошибка загрузки профиля пользователя');
+                    }
                 } else {
                     currentUser = null;
-                    document.getElementById('loginScreen').classList.remove('hidden');
-                    document.getElementById('dashboard').classList.remove('visible');
+                    const loginScreen = document.getElementById('loginScreen');
+                    const dashboard = document.getElementById('dashboard');
+                    if (loginScreen) loginScreen.classList.remove('hidden');
+                    if (dashboard) dashboard.classList.remove('visible');
                     cleanupListeners();
                 }
             });
@@ -2979,6 +3050,9 @@
                     renderExpenses();
                     renderFinance();
                     renderPnL();
+                }, err => {
+                    console.error('Expenses listener error:', err);
+                    setSyncStatus('offline');
                 });
             unsubscribes.push(expUnsub);
 
@@ -2987,11 +3061,15 @@
                 .onSnapshot(snap => {
                     state.monthlyExpenses = {};
                     snap.docs.forEach(doc => {
-                        state.monthlyExpenses[doc.id] = doc.data().expenses || [];
+                        const data = doc.data();
+                        state.monthlyExpenses[doc.id] = (data && data.expenses) || [];
                     });
                     renderExpenses();
                     renderFinance();
                     renderPnL();
+                }, err => {
+                    console.error('Monthly expenses listener error:', err);
+                    setSyncStatus('offline');
                 });
             unsubscribes.push(monthlyExpUnsub);
 
@@ -3000,6 +3078,9 @@
                 .onSnapshot(snap => {
                     state.risks = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                     renderRisks();
+                }, err => {
+                    console.error('Risks listener error:', err);
+                    setSyncStatus('offline');
                 });
             unsubscribes.push(risksUnsub);
 
@@ -3008,14 +3089,17 @@
                 .onSnapshot(doc => {
                     if (doc.exists) {
                         const data = doc.data();
-                        state.targets = data.targets || {};
-                        state.cushion = data.cushion || 0;
-                        state.brokers = data.brokers || [...CONFIG.defaultBrokers];
+                        state.targets = (data && data.targets) || {};
+                        state.cushion = (data && data.cushion) || 0;
+                        state.brokers = (data && data.brokers) || [...CONFIG.defaultBrokers];
                         renderPlanning();
                         renderFinance();
                         renderBrokers();
                         updateBrokerSelects();
                     }
+                }, err => {
+                    console.error('Settings listener error:', err);
+                    setSyncStatus('offline');
                 });
             unsubscribes.push(settingsUnsub);
         }
@@ -3030,18 +3114,25 @@
         // =============================================
         async function saveDeal(dealData, id = null) {
             setSyncStatus('syncing');
-            const data = {
-                ...dealData,
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                updatedBy: currentUser.uid
-            };
-            
-            if (id) {
-                await db.collection('deals').doc(id).update(data);
-            } else {
-                data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-                data.createdBy = currentUser.uid;
-                await db.collection('deals').add(data);
+            try {
+                const data = {
+                    ...dealData,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    updatedBy: currentUser.uid
+                };
+
+                if (id) {
+                    await db.collection('deals').doc(id).update(data);
+                } else {
+                    data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+                    data.createdBy = currentUser.uid;
+                    await db.collection('deals').add(data);
+                }
+                setSyncStatus('');
+            } catch (err) {
+                console.error('Error saving deal:', err);
+                setSyncStatus('offline');
+                throw new Error('Не удалось сохранить сделку: ' + (err.message || 'Неизвестная ошибка'));
             }
         }
 
@@ -3049,24 +3140,36 @@
         let pendingDeleteAction = null;
 
         function showConfirmDialog(title, text, icon, onConfirm) {
-            document.getElementById('confirmTitle').textContent = title;
-            document.getElementById('confirmText').textContent = text;
-            document.getElementById('confirmIcon').textContent = icon;
+            const titleEl = document.getElementById('confirmTitle');
+            const textEl = document.getElementById('confirmText');
+            const iconEl = document.getElementById('confirmIcon');
+            const dialogEl = document.getElementById('confirmDialog');
+            if (titleEl) titleEl.textContent = title;
+            if (textEl) textEl.textContent = text;
+            if (iconEl) iconEl.textContent = icon;
             pendingDeleteAction = onConfirm;
-            document.getElementById('confirmDialog').classList.add('show');
+            if (dialogEl) dialogEl.classList.add('show');
         }
 
         function closeConfirmDialog() {
-            document.getElementById('confirmDialog').classList.remove('show');
+            const dialogEl = document.getElementById('confirmDialog');
+            if (dialogEl) dialogEl.classList.remove('show');
             pendingDeleteAction = null;
         }
 
-        document.getElementById('confirmBtn').addEventListener('click', async () => {
-            if (pendingDeleteAction) {
-                await pendingDeleteAction();
-                closeConfirmDialog();
-            }
-        });
+        const confirmBtn = document.getElementById('confirmBtn');
+        if (confirmBtn) {
+            confirmBtn.addEventListener('click', async () => {
+                if (pendingDeleteAction) {
+                    try {
+                        await pendingDeleteAction();
+                    } catch (err) {
+                        console.error('Error in confirm action:', err);
+                    }
+                    closeConfirmDialog();
+                }
+            });
+        }
 
         async function deleteDeal(id) {
             const deal = state.deals.find(d => d.id === id);
@@ -3076,18 +3179,34 @@
                 `Вы уверены, что хотите удалить "${dealName}"? Это действие нельзя отменить.`,
                 '🗑️',
                 async () => {
-                    await db.collection('deals').doc(id).delete();
+                    setSyncStatus('syncing');
+                    try {
+                        await db.collection('deals').doc(id).delete();
+                        setSyncStatus('');
+                    } catch (err) {
+                        console.error('Error deleting deal:', err);
+                        setSyncStatus('offline');
+                        alert('Не удалось удалить сделку: ' + (err.message || 'Неизвестная ошибка'));
+                    }
                 }
             );
         }
 
         async function saveExpense(expData, id = null) {
-            const data = { ...expData, updatedAt: firebase.firestore.FieldValue.serverTimestamp() };
-            if (id) {
-                await db.collection('expenses').doc(id).update(data);
-            } else {
-                data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-                await db.collection('expenses').add(data);
+            setSyncStatus('syncing');
+            try {
+                const data = { ...expData, updatedAt: firebase.firestore.FieldValue.serverTimestamp() };
+                if (id) {
+                    await db.collection('expenses').doc(id).update(data);
+                } else {
+                    data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+                    await db.collection('expenses').add(data);
+                }
+                setSyncStatus('');
+            } catch (err) {
+                console.error('Error saving expense:', err);
+                setSyncStatus('offline');
+                throw new Error('Не удалось сохранить расход: ' + (err.message || 'Неизвестная ошибка'));
             }
         }
 
@@ -3099,17 +3218,33 @@
                 `Вы уверены, что хотите удалить "${expName}"?`,
                 '💸',
                 async () => {
-                    await db.collection('expenses').doc(id).delete();
+                    setSyncStatus('syncing');
+                    try {
+                        await db.collection('expenses').doc(id).delete();
+                        setSyncStatus('');
+                    } catch (err) {
+                        console.error('Error deleting expense:', err);
+                        setSyncStatus('offline');
+                        alert('Не удалось удалить расход: ' + (err.message || 'Неизвестная ошибка'));
+                    }
                 }
             );
         }
 
         // Monthly Expenses CRUD
         async function saveMonthlyExpenses(periodKey, expenses) {
-            await db.collection('monthlyExpenses').doc(periodKey).set({
-                expenses: expenses,
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
+            setSyncStatus('syncing');
+            try {
+                await db.collection('monthlyExpenses').doc(periodKey).set({
+                    expenses: expenses,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                setSyncStatus('');
+            } catch (err) {
+                console.error('Error saving monthly expenses:', err);
+                setSyncStatus('offline');
+                throw new Error('Не удалось сохранить расходы за месяц: ' + (err.message || 'Неизвестная ошибка'));
+            }
         }
 
         async function initMonthlyExpenses(periodKey) {
@@ -3157,7 +3292,15 @@
         }
 
         async function resetMonthlyExpenses(periodKey) {
-            await db.collection('monthlyExpenses').doc(periodKey).delete();
+            setSyncStatus('syncing');
+            try {
+                await db.collection('monthlyExpenses').doc(periodKey).delete();
+                setSyncStatus('');
+            } catch (err) {
+                console.error('Error resetting monthly expenses:', err);
+                setSyncStatus('offline');
+                throw new Error('Не удалось сбросить расходы за месяц: ' + (err.message || 'Неизвестная ошибка'));
+            }
         }
 
         function formatPeriodLabel(periodKey) {
@@ -3166,12 +3309,20 @@
         }
 
         async function saveRisk(riskData, id = null) {
-            const data = { ...riskData, updatedAt: firebase.firestore.FieldValue.serverTimestamp() };
-            if (id) {
-                await db.collection('risks').doc(id).update(data);
-            } else {
-                data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-                await db.collection('risks').add(data);
+            setSyncStatus('syncing');
+            try {
+                const data = { ...riskData, updatedAt: firebase.firestore.FieldValue.serverTimestamp() };
+                if (id) {
+                    await db.collection('risks').doc(id).update(data);
+                } else {
+                    data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+                    await db.collection('risks').add(data);
+                }
+                setSyncStatus('');
+            } catch (err) {
+                console.error('Error saving risk:', err);
+                setSyncStatus('offline');
+                throw new Error('Не удалось сохранить риск: ' + (err.message || 'Неизвестная ошибка'));
             }
         }
 
@@ -3181,13 +3332,29 @@
                 'Вы уверены, что хотите удалить этот риск?',
                 '⚠️',
                 async () => {
-                    await db.collection('risks').doc(id).delete();
+                    setSyncStatus('syncing');
+                    try {
+                        await db.collection('risks').doc(id).delete();
+                        setSyncStatus('');
+                    } catch (err) {
+                        console.error('Error deleting risk:', err);
+                        setSyncStatus('offline');
+                        alert('Не удалось удалить риск: ' + (err.message || 'Неизвестная ошибка'));
+                    }
                 }
             );
         }
 
         async function saveSettings(settings) {
-            await db.collection('settings').doc('main').set(settings, { merge: true });
+            setSyncStatus('syncing');
+            try {
+                await db.collection('settings').doc('main').set(settings, { merge: true });
+                setSyncStatus('');
+            } catch (err) {
+                console.error('Error saving settings:', err);
+                setSyncStatus('offline');
+                throw new Error('Не удалось сохранить настройки: ' + (err.message || 'Неизвестная ошибка'));
+            }
         }
 
         // =============================================
@@ -3554,44 +3721,77 @@
                 alert('Ошибка: ' + e.message);
             }
         };
-        window.addMonthExp = function(pk) {
+        window.addMonthExp = async function(pk) {
             var desc = prompt('Описание расхода:');
-            if (!desc) return;
+            if (!desc || !desc.trim()) return;
             var amt = prompt('Сумма (THB):');
             if (!amt) return;
+            var parsedAmt = parseFloat(amt);
+            if (isNaN(parsedAmt)) {
+                alert('Введите корректную сумму');
+                return;
+            }
             var cat = prompt('Категория (operations/marketing/salary/rent/other):', 'operations');
-            addMonthlyExpense(pk, {
-                category: cat || 'operations',
-                description: desc,
-                amount: parseFloat(amt) || 0
-            });
+            try {
+                await addMonthlyExpense(pk, {
+                    category: cat || 'operations',
+                    description: desc.trim(),
+                    amount: parsedAmt
+                });
+            } catch (err) {
+                alert(err.message || 'Ошибка при добавлении расхода');
+            }
         };
-        window.editMonthExp = function(pk, id) {
+        window.editMonthExp = async function(pk, id) {
             var exp = (state.monthlyExpenses[pk] || []).find(function(e) { return e.id === id; });
-            if (!exp) return;
+            if (!exp) {
+                alert('Расход не найден');
+                return;
+            }
             var desc = prompt('Описание:', exp.description);
             if (desc === null) return;
             var amt = prompt('Сумма:', exp.amount);
             if (amt === null) return;
-            updateMonthlyExpense(pk, id, {
-                category: exp.category,
-                description: desc,
-                amount: parseFloat(amt) || 0
-            });
-        };
-        window.delMonthExp = function(pk, id) {
-            if (confirm('Удалить этот расход?')) {
-                deleteMonthlyExpense(pk, id);
+            var parsedAmt = parseFloat(amt);
+            if (isNaN(parsedAmt)) {
+                alert('Введите корректную сумму');
+                return;
+            }
+            try {
+                await updateMonthlyExpense(pk, id, {
+                    category: exp.category,
+                    description: desc,
+                    amount: parsedAmt
+                });
+            } catch (err) {
+                alert(err.message || 'Ошибка при обновлении расхода');
             }
         };
-        window.resetMonth = function(pk) {
+        window.delMonthExp = async function(pk, id) {
+            if (confirm('Удалить этот расход?')) {
+                try {
+                    await deleteMonthlyExpense(pk, id);
+                } catch (err) {
+                    alert(err.message || 'Ошибка при удалении расхода');
+                }
+            }
+        };
+        window.resetMonth = async function(pk) {
             if (confirm('Сбросить корректировки и вернуть базовые расходы?')) {
-                resetMonthlyExpenses(pk);
+                try {
+                    await resetMonthlyExpenses(pk);
+                } catch (err) {
+                    alert(err.message || 'Ошибка при сбросе расходов');
+                }
             }
         };
 
         function renderRisks() {
             const tbody = document.getElementById('risksBody');
+            if (!tbody) {
+                console.warn('Risks table body element not found');
+                return;
+            }
             if (state.risks.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Нет рисков</td></tr>';
                 return;
@@ -3600,8 +3800,8 @@
             tbody.innerHTML = state.risks.map(r => `
                 <tr>
                     <td><span class="badge ${r.status === 'high' ? 'red' : r.status === 'medium' ? 'peach' : 'green'}">${r.status === 'high' ? '🔴 Высокий' : r.status === 'medium' ? '🟠 Средний' : '🟢 Низкий'}</span></td>
-                    <td>${r.description}</td>
-                    <td>${r.solution}</td>
+                    <td>${r.description || ''}</td>
+                    <td>${r.solution || ''}</td>
                     <td style="color: ${r.execution ? 'var(--text-primary)' : 'var(--text-muted)'};">${r.execution || '—'}</td>
                     <td>
                         <div style="display: flex; gap: 4px;">
@@ -4434,13 +4634,25 @@
                 const stage = document.getElementById('dealStage').value;
                 const paymentStatus = document.getElementById('dealPaymentStatus').value;
                 const receivedAt = document.getElementById('dealReceivedAt').value;
-                
+
                 // Validation: if payment status is "received", date is required
                 if (paymentStatus === 'received' && !receivedAt) {
                     alert('При статусе "Получено" необходимо указать дату получения денег');
                     return;
                 }
-                
+
+                // Validate required fields
+                const nameEl = document.getElementById('dealName');
+                const amountEl = document.getElementById('dealAmount');
+                if (!nameEl || !nameEl.value.trim()) {
+                    alert('Введите название сделки');
+                    return;
+                }
+                if (!amountEl || isNaN(parseFloat(amountEl.value))) {
+                    alert('Введите корректную сумму сделки');
+                    return;
+                }
+
                 const data = {
                     name: document.getElementById('dealName').value,
                     amount: parseFloat(document.getElementById('dealAmount').value),
@@ -4476,54 +4688,89 @@
                     data.closedPeriod = periodKey;
                 }
 
-                await saveDeal(data, id || null);
-                closeModal('dealModal');
+                try {
+                    await saveDeal(data, id || null);
+                    closeModal('dealModal');
+                } catch (err) {
+                    alert(err.message || 'Ошибка при сохранении сделки');
+                }
             });
 
             // Expense
             document.getElementById('expenseForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
-                await saveExpense({
-                    category: document.getElementById('expCategory').value,
-                    description: document.getElementById('expDescription').value,
-                    amount: parseFloat(document.getElementById('expAmount').value),
-                    period: document.getElementById('expPeriod').value
-                });
-                closeModal('expenseModal');
-                document.getElementById('expenseForm').reset();
+                const amountEl = document.getElementById('expAmount');
+                const descEl = document.getElementById('expDescription');
+                if (!descEl || !descEl.value.trim()) {
+                    alert('Введите описание расхода');
+                    return;
+                }
+                if (!amountEl || isNaN(parseFloat(amountEl.value))) {
+                    alert('Введите корректную сумму расхода');
+                    return;
+                }
+                try {
+                    await saveExpense({
+                        category: document.getElementById('expCategory').value,
+                        description: descEl.value,
+                        amount: parseFloat(amountEl.value),
+                        period: document.getElementById('expPeriod').value
+                    });
+                    closeModal('expenseModal');
+                    document.getElementById('expenseForm').reset();
+                } catch (err) {
+                    alert(err.message || 'Ошибка при сохранении расхода');
+                }
             });
 
             // Risk
             document.getElementById('riskForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const id = document.getElementById('riskId').value;
-                await saveRisk({
-                    status: document.getElementById('riskStatus').value,
-                    description: document.getElementById('riskDesc').value,
-                    solution: document.getElementById('riskSolution').value,
-                    execution: document.getElementById('riskExec').value
-                }, id || null);
-                closeModal('riskModal');
+                const descEl = document.getElementById('riskDesc');
+                if (!descEl || !descEl.value.trim()) {
+                    alert('Введите описание риска');
+                    return;
+                }
+                try {
+                    await saveRisk({
+                        status: document.getElementById('riskStatus').value,
+                        description: descEl.value,
+                        solution: document.getElementById('riskSolution').value,
+                        execution: document.getElementById('riskExec').value
+                    }, id || null);
+                    closeModal('riskModal');
+                } catch (err) {
+                    alert(err.message || 'Ошибка при сохранении риска');
+                }
             });
 
             // Targets
             document.getElementById('targetsForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const year = state.period.year;
-                const targets = { ...state.targets };
-                targets[`${year}-annual`] = parseFloat(document.getElementById('targetAnnual').value) || 0;
-                for (let m = 1; m <= 12; m++) {
-                    targets[getPeriodKey(year, m)] = parseFloat(document.getElementById(`target_${m}`).value) || 0;
+                try {
+                    const year = state.period.year;
+                    const targets = { ...state.targets };
+                    targets[`${year}-annual`] = parseFloat(document.getElementById('targetAnnual').value) || 0;
+                    for (let m = 1; m <= 12; m++) {
+                        targets[getPeriodKey(year, m)] = parseFloat(document.getElementById(`target_${m}`).value) || 0;
+                    }
+                    await saveSettings({ targets });
+                    closeModal('targetsModal');
+                } catch (err) {
+                    alert(err.message || 'Ошибка при сохранении целей');
                 }
-                await saveSettings({ targets });
-                closeModal('targetsModal');
             });
 
             // Cushion
             document.getElementById('cushionForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
-                await saveSettings({ cushion: parseFloat(document.getElementById('cushionAmount').value) || 0 });
-                closeModal('cushionModal');
+                try {
+                    await saveSettings({ cushion: parseFloat(document.getElementById('cushionAmount').value) || 0 });
+                    closeModal('cushionModal');
+                } catch (err) {
+                    alert(err.message || 'Ошибка при сохранении подушки');
+                }
             });
 
             // Monthly Expense
@@ -4531,17 +4778,31 @@
                 e.preventDefault();
                 var pk = document.getElementById('monthExpPeriod').value;
                 var id = document.getElementById('monthExpId').value;
+                var descEl = document.getElementById('monthExpDesc');
+                var amtEl = document.getElementById('monthExpAmt');
+                if (!descEl || !descEl.value.trim()) {
+                    alert('Введите описание расхода');
+                    return;
+                }
+                if (!amtEl || isNaN(parseFloat(amtEl.value))) {
+                    alert('Введите корректную сумму расхода');
+                    return;
+                }
                 var data = {
                     category: document.getElementById('monthExpCat').value,
-                    description: document.getElementById('monthExpDesc').value,
-                    amount: parseFloat(document.getElementById('monthExpAmt').value) || 0
+                    description: descEl.value,
+                    amount: parseFloat(amtEl.value) || 0
                 };
-                if (id) {
-                    await updateMonthlyExpense(pk, id, data);
-                } else {
-                    await addMonthlyExpense(pk, data);
+                try {
+                    if (id) {
+                        await updateMonthlyExpense(pk, id, data);
+                    } else {
+                        await addMonthlyExpense(pk, data);
+                    }
+                    closeModal('monthExpModal');
+                } catch (err) {
+                    alert(err.message || 'Ошибка при сохранении расхода за месяц');
                 }
-                closeModal('monthExpModal');
             });
         }
 
