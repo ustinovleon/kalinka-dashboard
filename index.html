@@ -1242,6 +1242,112 @@
             justify-content: center;
         }
 
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        }
+
+        .toast {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-soft);
+            min-width: 300px;
+            max-width: 450px;
+            pointer-events: auto;
+            transform: translateX(120%);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .toast.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .toast.hide {
+            transform: translateX(120%);
+            opacity: 0;
+        }
+
+        .toast-icon {
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .toast-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .toast-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .toast-message {
+            font-size: 13px;
+            color: var(--text-secondary);
+            word-wrap: break-word;
+        }
+
+        .toast-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 4px;
+            font-size: 16px;
+            line-height: 1;
+            opacity: 0.7;
+            transition: opacity 0.2s ease;
+        }
+
+        .toast-close:hover {
+            opacity: 1;
+        }
+
+        .toast.toast-success {
+            border-left: 3px solid var(--accent-green);
+        }
+
+        .toast.toast-error {
+            border-left: 3px solid var(--kalinka-red-bright);
+        }
+
+        .toast.toast-warning {
+            border-left: 3px solid var(--kalinka-peach);
+        }
+
+        .toast.toast-info {
+            border-left: 3px solid var(--kalinka-blue);
+        }
+
+        @media (max-width: 480px) {
+            .toast-container {
+                left: 10px;
+                right: 10px;
+                top: 10px;
+            }
+            .toast {
+                min-width: auto;
+                max-width: none;
+            }
+        }
+
         /* Search and Filter Bar */
         .filter-bar {
             display: flex;
@@ -2580,6 +2686,9 @@
         </div>
     </div>
 
+    <!-- Toast Notifications Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
     <!-- Skip Link for Accessibility -->
     <a href="#main-content" class="skip-link">Перейти к основному контенту</a>
 
@@ -3157,6 +3266,55 @@
             pendingDeleteAction = null;
         }
 
+        // Toast Notification System
+        function showToast(message, type = 'info', duration = 4000) {
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+
+            const icons = {
+                success: '✓',
+                error: '✕',
+                warning: '⚠',
+                info: 'ℹ'
+            };
+
+            const titles = {
+                success: 'Успешно',
+                error: 'Ошибка',
+                warning: 'Внимание',
+                info: 'Информация'
+            };
+
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.innerHTML = `
+                <span class="toast-icon">${icons[type] || icons.info}</span>
+                <div class="toast-content">
+                    <div class="toast-title">${titles[type] || titles.info}</div>
+                    <div class="toast-message">${message}</div>
+                </div>
+                <button class="toast-close" onclick="this.parentElement.remove()">✕</button>
+            `;
+
+            container.appendChild(toast);
+
+            // Trigger animation
+            requestAnimationFrame(() => {
+                toast.classList.add('show');
+            });
+
+            // Auto-remove after duration
+            if (duration > 0) {
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    toast.classList.add('hide');
+                    setTimeout(() => toast.remove(), 300);
+                }, duration);
+            }
+
+            return toast;
+        }
+
         const confirmBtn = document.getElementById('confirmBtn');
         if (confirmBtn) {
             confirmBtn.addEventListener('click', async () => {
@@ -3186,7 +3344,7 @@
                     } catch (err) {
                         console.error('Error deleting deal:', err);
                         setSyncStatus('offline');
-                        alert('Не удалось удалить сделку: ' + (err.message || 'Неизвестная ошибка'));
+                        showToast('Не удалось удалить сделку: ' + (err.message || 'Неизвестная ошибка'), 'error');
                     }
                 }
             );
@@ -3225,7 +3383,7 @@
                     } catch (err) {
                         console.error('Error deleting expense:', err);
                         setSyncStatus('offline');
-                        alert('Не удалось удалить расход: ' + (err.message || 'Неизвестная ошибка'));
+                        showToast('Не удалось удалить расход: ' + (err.message || 'Неизвестная ошибка'), 'error');
                     }
                 }
             );
@@ -3339,7 +3497,7 @@
                     } catch (err) {
                         console.error('Error deleting risk:', err);
                         setSyncStatus('offline');
-                        alert('Не удалось удалить риск: ' + (err.message || 'Неизвестная ошибка'));
+                        showToast('Не удалось удалить риск: ' + (err.message || 'Неизвестная ошибка'), 'error');
                     }
                 }
             );
@@ -3715,10 +3873,10 @@
         window.startMonthEdit = async function(pk) {
             try {
                 await initMonthlyExpenses(pk);
-                alert('Расходы за ' + formatPeriodLabel(pk) + ' готовы к редактированию');
+                showToast('Расходы за ' + formatPeriodLabel(pk) + ' готовы к редактированию', 'success');
             } catch(e) {
                 console.error(e);
-                alert('Ошибка: ' + e.message);
+                showToast('Ошибка: ' + e.message, 'error');
             }
         };
         window.addMonthExp = async function(pk) {
@@ -3728,7 +3886,7 @@
             if (!amt) return;
             var parsedAmt = parseFloat(amt);
             if (isNaN(parsedAmt)) {
-                alert('Введите корректную сумму');
+                showToast('Введите корректную сумму', 'warning');
                 return;
             }
             var cat = prompt('Категория (operations/marketing/salary/rent/other):', 'operations');
@@ -3739,13 +3897,13 @@
                     amount: parsedAmt
                 });
             } catch (err) {
-                alert(err.message || 'Ошибка при добавлении расхода');
+                showToast(err.message || 'Ошибка при добавлении расхода', 'error');
             }
         };
         window.editMonthExp = async function(pk, id) {
             var exp = (state.monthlyExpenses[pk] || []).find(function(e) { return e.id === id; });
             if (!exp) {
-                alert('Расход не найден');
+                showToast('Расход не найден', 'error');
                 return;
             }
             var desc = prompt('Описание:', exp.description);
@@ -3754,7 +3912,7 @@
             if (amt === null) return;
             var parsedAmt = parseFloat(amt);
             if (isNaN(parsedAmt)) {
-                alert('Введите корректную сумму');
+                showToast('Введите корректную сумму', 'warning');
                 return;
             }
             try {
@@ -3764,7 +3922,7 @@
                     amount: parsedAmt
                 });
             } catch (err) {
-                alert(err.message || 'Ошибка при обновлении расхода');
+                showToast(err.message || 'Ошибка при обновлении расхода', 'error');
             }
         };
         window.delMonthExp = async function(pk, id) {
@@ -3772,7 +3930,7 @@
                 try {
                     await deleteMonthlyExpense(pk, id);
                 } catch (err) {
-                    alert(err.message || 'Ошибка при удалении расхода');
+                    showToast(err.message || 'Ошибка при удалении расхода', 'error');
                 }
             }
         };
@@ -3781,7 +3939,7 @@
                 try {
                     await resetMonthlyExpenses(pk);
                 } catch (err) {
-                    alert(err.message || 'Ошибка при сбросе расходов');
+                    showToast(err.message || 'Ошибка при сбросе расходов', 'error');
                 }
             }
         };
@@ -4516,12 +4674,12 @@
             const name = nameInput.value.trim();
             
             if (!name) {
-                alert('Введите имя брокера');
+                showToast('Введите имя брокера', 'warning');
                 return;
             }
             
             if ((state.brokers || []).includes(name)) {
-                alert('Брокер с таким именем уже существует');
+                showToast('Брокер с таким именем уже существует', 'warning');
                 return;
             }
             
@@ -4540,7 +4698,7 @@
                 setSyncStatus('');
             } catch (err) {
                 console.error('Error adding broker:', err);
-                alert('Ошибка при добавлении брокера');
+                showToast('Ошибка при добавлении брокера', 'error');
                 setSyncStatus('offline');
             }
         };
@@ -4550,7 +4708,7 @@
             const brokerDeals = state.deals.filter(d => d.broker === brokerName);
             
             if (brokerDeals.length > 0) {
-                alert(`Невозможно удалить брокера "${brokerName}": у него есть ${brokerDeals.length} сделок. Сначала переназначьте или удалите сделки.`);
+                showToast(`Невозможно удалить брокера "${brokerName}": у него есть ${brokerDeals.length} сделок. Сначала переназначьте или удалите сделки.`, 'warning');
                 return;
             }
             
@@ -4573,7 +4731,7 @@
                         setSyncStatus('');
                     } catch (err) {
                         console.error('Error removing broker:', err);
-                        alert('Ошибка при удалении брокера');
+                        showToast('Ошибка при удалении брокера', 'error');
                         setSyncStatus('offline');
                     }
                 }
@@ -4637,7 +4795,7 @@
 
                 // Validation: if payment status is "received", date is required
                 if (paymentStatus === 'received' && !receivedAt) {
-                    alert('При статусе "Получено" необходимо указать дату получения денег');
+                    showToast('При статусе "Получено" необходимо указать дату получения денег', 'warning');
                     return;
                 }
 
@@ -4645,11 +4803,11 @@
                 const nameEl = document.getElementById('dealName');
                 const amountEl = document.getElementById('dealAmount');
                 if (!nameEl || !nameEl.value.trim()) {
-                    alert('Введите название сделки');
+                    showToast('Введите название сделки', 'warning');
                     return;
                 }
                 if (!amountEl || isNaN(parseFloat(amountEl.value))) {
-                    alert('Введите корректную сумму сделки');
+                    showToast('Введите корректную сумму сделки', 'warning');
                     return;
                 }
 
@@ -4692,7 +4850,7 @@
                     await saveDeal(data, id || null);
                     closeModal('dealModal');
                 } catch (err) {
-                    alert(err.message || 'Ошибка при сохранении сделки');
+                    showToast(err.message || 'Ошибка при сохранении сделки', 'error');
                 }
             });
 
@@ -4702,11 +4860,11 @@
                 const amountEl = document.getElementById('expAmount');
                 const descEl = document.getElementById('expDescription');
                 if (!descEl || !descEl.value.trim()) {
-                    alert('Введите описание расхода');
+                    showToast('Введите описание расхода', 'warning');
                     return;
                 }
                 if (!amountEl || isNaN(parseFloat(amountEl.value))) {
-                    alert('Введите корректную сумму расхода');
+                    showToast('Введите корректную сумму расхода', 'warning');
                     return;
                 }
                 try {
@@ -4719,7 +4877,7 @@
                     closeModal('expenseModal');
                     document.getElementById('expenseForm').reset();
                 } catch (err) {
-                    alert(err.message || 'Ошибка при сохранении расхода');
+                    showToast(err.message || 'Ошибка при сохранении расхода', 'error');
                 }
             });
 
@@ -4729,7 +4887,7 @@
                 const id = document.getElementById('riskId').value;
                 const descEl = document.getElementById('riskDesc');
                 if (!descEl || !descEl.value.trim()) {
-                    alert('Введите описание риска');
+                    showToast('Введите описание риска', 'warning');
                     return;
                 }
                 try {
@@ -4741,7 +4899,7 @@
                     }, id || null);
                     closeModal('riskModal');
                 } catch (err) {
-                    alert(err.message || 'Ошибка при сохранении риска');
+                    showToast(err.message || 'Ошибка при сохранении риска', 'error');
                 }
             });
 
@@ -4758,7 +4916,7 @@
                     await saveSettings({ targets });
                     closeModal('targetsModal');
                 } catch (err) {
-                    alert(err.message || 'Ошибка при сохранении целей');
+                    showToast(err.message || 'Ошибка при сохранении целей', 'error');
                 }
             });
 
@@ -4769,7 +4927,7 @@
                     await saveSettings({ cushion: parseFloat(document.getElementById('cushionAmount').value) || 0 });
                     closeModal('cushionModal');
                 } catch (err) {
-                    alert(err.message || 'Ошибка при сохранении подушки');
+                    showToast(err.message || 'Ошибка при сохранении подушки', 'error');
                 }
             });
 
@@ -4781,11 +4939,11 @@
                 var descEl = document.getElementById('monthExpDesc');
                 var amtEl = document.getElementById('monthExpAmt');
                 if (!descEl || !descEl.value.trim()) {
-                    alert('Введите описание расхода');
+                    showToast('Введите описание расхода', 'warning');
                     return;
                 }
                 if (!amtEl || isNaN(parseFloat(amtEl.value))) {
-                    alert('Введите корректную сумму расхода');
+                    showToast('Введите корректную сумму расхода', 'warning');
                     return;
                 }
                 var data = {
@@ -4801,7 +4959,7 @@
                     }
                     closeModal('monthExpModal');
                 } catch (err) {
-                    alert(err.message || 'Ошибка при сохранении расхода за месяц');
+                    showToast(err.message || 'Ошибка при сохранении расхода за месяц', 'error');
                 }
             });
         }
