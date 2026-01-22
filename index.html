@@ -3330,30 +3330,18 @@
                     <div class="section-body">
                         <div class="kpi-grid">
                             <div class="kpi-card">
-                                <div class="kpi-header">
-                                    <div class="kpi-icon" style="background: var(--kalinka-blue-dim)"></div>
-                                </div>
                                 <div class="kpi-value" id="annualTarget">฿0</div>
                                 <div class="kpi-label">Годовой план</div>
                             </div>
                             <div class="kpi-card">
-                                <div class="kpi-header">
-                                    <div class="kpi-icon" style="background: var(--accent-green-dim)">✅</div>
-                                </div>
                                 <div class="kpi-value" id="annualFact">฿0</div>
                                 <div class="kpi-label">Факт (YTD)</div>
                             </div>
                             <div class="kpi-card">
-                                <div class="kpi-header">
-                                    <div class="kpi-icon" style="background: var(--kalinka-peach-dim)"></div>
-                                </div>
                                 <div class="kpi-value" id="annualPercent">0%</div>
                                 <div class="kpi-label">Выполнение</div>
                             </div>
                             <div class="kpi-card">
-                                <div class="kpi-header">
-                                    <div class="kpi-icon" style="background: var(--kalinka-blue-dim)"></div>
-                                </div>
                                 <div class="kpi-value" id="annualForecast">฿0</div>
                                 <div class="kpi-label">Прогноз года</div>
                             </div>
@@ -4467,30 +4455,20 @@
             document.getElementById('overviewKPIs').innerHTML = `
                 <div class="kpi-card">
                     <div class="kpi-header">
-                        <div class="kpi-icon" style="background: var(--accent-green-dim)"></div>
                         <span class="kpi-trend ${coverage >= 90 ? 'up' : 'down'}">${coverage >= 90 ? '+' : '-'}</span>
                     </div>
                     <div class="kpi-value">${Math.round(coverage)}%</div>
                     <div class="kpi-label">Next Step Coverage (цель ≥90%)</div>
                 </div>
                 <div class="kpi-card">
-                    <div class="kpi-header">
-                        <div class="kpi-icon" style="background: var(--kalinka-blue-dim)"></div>
-                    </div>
                     <div class="kpi-value">${activeDeals.length}</div>
                     <div class="kpi-label">Активных сделок</div>
                 </div>
                 <div class="kpi-card">
-                    <div class="kpi-header">
-                        <div class="kpi-icon" style="background: var(--accent-green-dim)">✅</div>
-                    </div>
                     <div class="kpi-value">${closedDeals.length}</div>
                     <div class="kpi-label">Закрыто за период</div>
                 </div>
                 <div class="kpi-card">
-                    <div class="kpi-header">
-                        <div class="kpi-icon" style="background: var(--kalinka-peach-dim)"></div>
-                    </div>
                     <div class="kpi-value" style="font-size: 18px;">${formatTHB(pipeline)}</div>
                     <div class="kpi-label">Pipeline Value</div>
                 </div>
