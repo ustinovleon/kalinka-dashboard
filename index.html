@@ -3960,7 +3960,8 @@
             const amount = parseFloat(deal.amount) || 0;
             const commissionPct = parseFloat(deal.commissionPct) || 0;
             const cashBonus = parseFloat(deal.cashBonus) || 0;
-            const partnerPct = parseFloat(deal.partnerPct) || 0;
+            const partnerValue = parseFloat(deal.partnerPct) || 0; // Может быть % или фиксированная сумма
+            const partnerShareType = deal.partnerShareType || 'percent'; // 'percent' или 'fixed'
             const ropPct = parseFloat(deal.ropPct) || 0; // Ручной ввод, может быть пустым
             const brokerCommPct = parseFloat(deal.brokerCommPct) || 0;
             const taxPct = parseFloat(deal.taxPct) || 5; // Налог - теперь редактируемый, дефолт 5%
@@ -3971,45 +3972,57 @@
             // 1. Общая комиссия (Gross) = комиссия застройщика + кэшбонус
             const commissionOnly = r(amount * commissionPct / 100); // Комиссия БЕЗ кэшбонуса
             const grossIncome = r(commissionOnly + cashBonus);
-            
+
             // 2. Налог от общей комиссии (теперь настраиваемый)
             const taxDeduction = r(grossIncome * (taxPct / 100));
-            
+
             // 3. Комиссия нетто (после налога)
             const netAfterTax = r(grossIncome - taxDeduction);
-            
-            // 4. Доля внешнего партнёра - считается БЕЗ учёта кэшбонуса
-            // База для партнёра = комиссия нетто минус кэшбонус (после налога)
+
+            // 4. Доля внешнего партнёра
+            // Если тип 'percent' - считается от комиссии без кэшбонуса (после налога)
+            // Если тип 'fixed' - берётся фиксированная сумма в THB
             const netCommissionOnly = r(commissionOnly * ((100 - taxPct) / 100)); // Комиссия без кэшбонуса, после налога
-            const partnerPayout = r(netCommissionOnly * (partnerPct / 100));
-            
+            let partnerPayout;
+            let partnerPct;
+            if (partnerShareType === 'fixed') {
+                partnerPayout = r(partnerValue); // Фиксированная сумма в THB
+                // Вычисляем эквивалентный процент для отображения
+                partnerPct = netCommissionOnly > 0 ? r(partnerValue / netCommissionOnly * 100) : 0;
+            } else {
+                partnerPct = partnerValue;
+                partnerPayout = r(netCommissionOnly * (partnerPct / 100));
+            }
+
             // 5. База для распределения (РОП, брокер, компания)
             const netBase = r(netAfterTax - partnerPayout);
-            
+
             // 6. РОП - только если указан процент (ручной ввод)
             const ropBonus = r(ropPct > 0 ? netBase * (ropPct / 100) : 0);
-            
+
             // 7. Комиссия брокера
             const brokerCommission = r(netBase * (brokerCommPct / 100));
-            
+
             // 8. Прибыль компании
             const companyProfit = r(netBase - ropBonus - brokerCommission);
 
-            return { 
+            return {
                 commissionOnly,
-                grossIncome, 
+                grossIncome,
                 taxPct,
-                taxDeduction, 
+                taxDeduction,
                 netAfterTax,
                 netCommissionOnly,
-                partnerPayout, 
+                partnerPayout,
                 partnerPct,
+                partnerShareType,
+                partnerValue,
                 netBase,
                 ropBonus,
                 ropPct,
-                brokerCommission, 
-                companyProfit, 
-                brokerCommPct 
+                brokerCommission,
+                companyProfit,
+                brokerCommPct
             };
         }
 
@@ -5429,9 +5442,14 @@
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="form-label">Доля внешнего партнёра %</label>
-                            <input type="number" class="form-input" id="dealPartnerPct" value="0" min="0" max="100" oninput="calcDealPreview()">
-                            <span style="font-size: 10px; color: var(--text-muted);">Считается от комиссии без кэшбонуса</span>
+                            <label class="form-label">Доля внешнего партнёра</label>
+                            <div class="partner-share-toggle" style="margin-bottom: 8px;">
+                                <button type="button" class="income-type-btn active" id="partnerSharePct" onclick="setPartnerShareType('percent')" style="padding: 4px 12px; font-size: 11px;">%</button>
+                                <button type="button" class="income-type-btn" id="partnerShareThb" onclick="setPartnerShareType('fixed')" style="padding: 4px 12px; font-size: 11px;">THB</button>
+                            </div>
+                            <input type="hidden" id="dealPartnerShareType" value="percent">
+                            <input type="number" class="form-input" id="dealPartnerPct" value="0" min="0" oninput="calcDealPreview()">
+                            <span id="partnerShareHint" style="font-size: 10px; color: var(--text-muted);">Считается от комиссии без кэшбонуса</span>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Процент РОП %</label>
@@ -5453,7 +5471,7 @@
                         <div class="calc-row"><span class="calc-label">= Общая комиссия (Gross)</span><span class="calc-value" id="calcGross">฿0</span></div>
                         <div class="calc-row"><span class="calc-label">2. − Налог <span id="calcTaxPct">5</span>%</span><span class="calc-value negative" id="calcTax">−฿0</span></div>
                         <div class="calc-row"><span class="calc-label">= Комиссия нетто</span><span class="calc-value" id="calcNetAfterTax">฿0</span></div>
-                        <div class="calc-row"><span class="calc-label">3. − Внешний партнёр (<span id="calcPartnerPct">0</span>% от комиссии без бонуса)</span><span class="calc-value negative" id="calcPartner">−฿0</span></div>
+                        <div class="calc-row"><span class="calc-label">3. − Внешний партнёр (<span id="calcPartnerInfo">0% от комиссии без бонуса</span>)</span><span class="calc-value negative" id="calcPartner">−฿0</span></div>
                         <div class="calc-row"><span class="calc-label">= База распределения</span><span class="calc-value" id="calcNetBase">฿0</span></div>
                         <div class="calc-row" id="calcRopRow"><span class="calc-label">4. − РОП (<span id="calcRopPct">0</span>%)</span><span class="calc-value negative" id="calcROP">−฿0</span></div>
                         <div class="calc-row"><span class="calc-label">5. − Брокер (<span id="calcBrokerPct">0</span>%)</span><span class="calc-value negative" id="calcBroker">−฿0</span></div>
@@ -5700,6 +5718,8 @@
                     document.getElementById('dealCashBonus').value = deal.cashBonus || 0;
                     document.getElementById('dealTaxPct').value = deal.taxPct || 5;
                     document.getElementById('dealPartnerPct').value = deal.partnerPct || 0;
+                    // Восстанавливаем тип партнёрской доли
+                    setPartnerShareType(deal.partnerShareType || 'percent');
                     document.getElementById('dealRopPct').value = deal.ropPct || '';
                     document.getElementById('dealNextStep').value = deal.nextStep || '';
                     document.getElementById('dealDate').value = deal.date || '';
@@ -5725,6 +5745,8 @@
                 document.getElementById('dealCashBonus').value = 0;
                 document.getElementById('dealPartnerPct').value = 0;
                 document.getElementById('dealTaxPct').value = 5;
+                // Сбрасываем тип партнёрской доли на процент
+                setPartnerShareType('percent');
                 // НЕ устанавливаем по умолчанию: commissionPct, brokerCommPct, ropPct
             }
 
@@ -6126,12 +6148,14 @@
 
         window.calcDealPreview = () => {
             const taxPctVal = parseFloat(document.getElementById('dealTaxPct').value) || 5;
-            
+            const partnerShareType = document.getElementById('dealPartnerShareType').value || 'percent';
+
             const calc = calculateDealFinancials({
                 amount: parseFloat(document.getElementById('dealAmount').value) || 0,
                 commissionPct: parseFloat(document.getElementById('dealCommPct').value) || 0,
                 cashBonus: parseFloat(document.getElementById('dealCashBonus').value) || 0,
                 partnerPct: parseFloat(document.getElementById('dealPartnerPct').value) || 0,
+                partnerShareType: partnerShareType,
                 ropPct: parseFloat(document.getElementById('dealRopPct').value) || 0,
                 brokerCommPct: parseFloat(document.getElementById('dealBrokerComm').value) || 0,
                 taxPct: taxPctVal
@@ -6139,6 +6163,7 @@
 
             const cashBonus = parseFloat(document.getElementById('dealCashBonus').value) || 0;
             const ropPctVal = document.getElementById('dealRopPct').value;
+            const partnerVal = document.getElementById('dealPartnerPct').value || '0';
 
             document.getElementById('calcCommOnly').textContent = formatTHB(calc.commissionOnly);
             document.getElementById('calcCashBonus').textContent = '+' + formatTHB(cashBonus);
@@ -6146,10 +6171,16 @@
             document.getElementById('calcTaxPct').textContent = taxPctVal;
             document.getElementById('calcTax').textContent = '−' + formatTHB(calc.taxDeduction);
             document.getElementById('calcNetAfterTax').textContent = formatTHB(calc.netAfterTax);
-            document.getElementById('calcPartnerPct').textContent = document.getElementById('dealPartnerPct').value || '0';
+
+            // Отображаем партнёра в зависимости от типа
+            if (partnerShareType === 'fixed') {
+                document.getElementById('calcPartnerInfo').textContent = formatTHB(partnerVal) + ' фикс.';
+            } else {
+                document.getElementById('calcPartnerInfo').textContent = partnerVal + '% от комиссии без бонуса';
+            }
             document.getElementById('calcPartner').textContent = '−' + formatTHB(calc.partnerPayout);
             document.getElementById('calcNetBase').textContent = formatTHB(calc.netBase);
-            
+
             // РОП - показываем только если указан процент
             const ropRow = document.getElementById('calcRopRow');
             if (ropPctVal && parseFloat(ropPctVal) > 0) {
@@ -6159,11 +6190,32 @@
             } else {
                 ropRow.style.display = 'none';
             }
-            
+
             document.getElementById('calcBrokerPct').textContent = document.getElementById('dealBrokerComm').value || '0';
             document.getElementById('calcBroker').textContent = '−' + formatTHB(calc.brokerCommission);
             document.getElementById('calcProfit').textContent = formatTHB(calc.companyProfit);
             document.getElementById('calcProfit').className = 'calc-value ' + (calc.companyProfit >= 0 ? 'positive' : 'negative');
+        };
+
+        // Переключатель типа партнёрской доли (% или THB)
+        window.setPartnerShareType = (type) => {
+            document.getElementById('partnerSharePct').classList.remove('active');
+            document.getElementById('partnerShareThb').classList.remove('active');
+
+            if (type === 'fixed') {
+                document.getElementById('partnerShareThb').classList.add('active');
+                document.getElementById('partnerShareHint').textContent = 'Фиксированная сумма в батах';
+                document.getElementById('dealPartnerPct').removeAttribute('max');
+                document.getElementById('dealPartnerPct').placeholder = 'Введите сумму THB';
+            } else {
+                document.getElementById('partnerSharePct').classList.add('active');
+                document.getElementById('partnerShareHint').textContent = 'Считается от комиссии без кэшбонуса';
+                document.getElementById('dealPartnerPct').setAttribute('max', '100');
+                document.getElementById('dealPartnerPct').placeholder = '';
+            }
+
+            document.getElementById('dealPartnerShareType').value = type;
+            calcDealPreview();
         };
 
         // =============================================
@@ -6216,6 +6268,7 @@
                     commissionPct: parseFloat(document.getElementById('dealCommPct').value) || 0,
                     cashBonus: parseFloat(document.getElementById('dealCashBonus').value) || 0,
                     partnerPct: parseFloat(document.getElementById('dealPartnerPct').value) || 0,
+                    partnerShareType: document.getElementById('dealPartnerShareType').value || 'percent',
                     ropPct: parseFloat(document.getElementById('dealRopPct').value) || 0,
                     taxPct: parseFloat(document.getElementById('dealTaxPct').value) || 5,
                     nextStep: document.getElementById('dealNextStep').value,
