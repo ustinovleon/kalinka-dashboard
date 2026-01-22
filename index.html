@@ -16,37 +16,58 @@
     <!-- Chart.js for P&L visualizations -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
 <style>
         :root {
-            --bg-primary: #0a0a0f;
-            --bg-secondary: #12121a;
-            --bg-card: rgba(255, 255, 255, 0.03);
-            --bg-card-hover: rgba(255, 255, 255, 0.06);
-            --border-color: rgba(255, 255, 255, 0.08);
-            --text-primary: #f0f0f5;
-            --text-secondary: #8b8b9e;
-            --text-muted: #7a7a8e;
-            --kalinka-blue: #172E4D;
-            --kalinka-blue-dim: rgba(23, 46, 77, 0.25);
-            --kalinka-blue-light: #1e3a5f;
+            /* Minimalist neutral palette */
+            --bg-primary: #0c0c10;
+            --bg-secondary: #14141a;
+            --bg-card: rgba(255, 255, 255, 0.025);
+            --bg-card-hover: rgba(255, 255, 255, 0.05);
+            --bg-card-elevated: rgba(255, 255, 255, 0.04);
+            --border-color: rgba(255, 255, 255, 0.06);
+            --border-color-strong: rgba(255, 255, 255, 0.12);
+            --text-primary: #f5f5f7;
+            --text-secondary: #9898a8;
+            --text-muted: #6c6c7c;
+
+            /* Brand colors */
+            --kalinka-blue: #1a3654;
+            --kalinka-blue-dim: rgba(26, 54, 84, 0.3);
+            --kalinka-blue-light: #2a4a6a;
             --kalinka-red: #9C021E;
-            --kalinka-red-bright: #FF2400;
-            --kalinka-red-dim: rgba(156, 2, 30, 0.2);
-            --kalinka-peach: #FFBC6B;
-            --kalinka-peach-dim: rgba(255, 188, 107, 0.2);
-            --accent-green: #00d26a;
-            --accent-green-dim: rgba(0, 210, 106, 0.15);
-            --glass-bg: rgba(18, 18, 26, 0.85);
-            --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.4);
-            --shadow-glow-blue: 0 0 40px rgba(23, 46, 77, 0.4);
-            --radius-sm: 8px;
-            --radius-md: 12px;
-            --radius-lg: 20px;
-            --radius-xl: 28px;
+            --kalinka-red-bright: #e63946;
+            --kalinka-red-dim: rgba(156, 2, 30, 0.15);
+            --kalinka-peach: #f4a261;
+            --kalinka-peach-dim: rgba(244, 162, 97, 0.15);
+            --accent-green: #2ecc71;
+            --accent-green-dim: rgba(46, 204, 113, 0.12);
+
+            /* Glass effects */
+            --glass-bg: rgba(20, 20, 26, 0.9);
+            --shadow-soft: 0 4px 24px rgba(0, 0, 0, 0.3);
+            --shadow-glow-blue: 0 0 32px rgba(26, 54, 84, 0.3);
+
+            /* Unified spacing system */
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            --space-2xl: 48px;
+
+            /* Typography scale (3 sizes) */
+            --text-sm: 12px;
+            --text-base: 14px;
+            --text-lg: 18px;
+            --text-xl: 24px;
+            --text-2xl: 32px;
+
+            /* Consistent radii */
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -353,24 +374,24 @@
             display: block;
         }
 
-        /* Header */
+        /* Header - Clean minimal style */
         .header {
             position: sticky;
             top: 0;
             z-index: 100;
             background: var(--glass-bg);
-            backdrop-filter: blur(20px);
+            backdrop-filter: blur(16px);
             border-bottom: 1px solid var(--border-color);
         }
 
         .header-content {
-            max-width: 1800px;
+            max-width: 1600px;
             margin: 0 auto;
-            padding: 12px 32px;
+            padding: var(--space-md) var(--space-xl);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 16px;
+            gap: var(--space-md);
             flex-wrap: wrap;
         }
 
@@ -497,6 +518,17 @@
             50% { opacity: 0.5; }
         }
 
+        /* Loading skeleton animation */
+        .loading-skeleton {
+            color: var(--text-muted);
+            animation: skeletonPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes skeletonPulse {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 0.8; }
+        }
+
         .user-menu {
             display: flex;
             align-items: center;
@@ -555,17 +587,17 @@
 
         /* Main Content */
         .main-content {
-            max-width: 1800px;
+            max-width: 1600px;
             margin: 0 auto;
-            padding: 24px 32px;
+            padding: var(--space-xl) var(--space-xl);
         }
 
-        /* Tabs */
+        /* Tabs - Minimalist style */
         .tabs-nav {
             display: flex;
-            gap: 6px;
-            margin-bottom: 24px;
-            padding: 6px;
+            gap: var(--space-xs);
+            margin-bottom: var(--space-xl);
+            padding: var(--space-xs);
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-lg);
@@ -573,25 +605,25 @@
         }
 
         .tab-btn {
-            padding: 10px 20px;
+            padding: var(--space-sm) var(--space-lg);
             background: transparent;
             border: none;
             border-radius: var(--radius-md);
-            color: var(--text-secondary);
+            color: var(--text-muted);
             font-family: inherit;
-            font-size: 13px;
+            font-size: var(--text-sm);
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s ease;
             white-space: nowrap;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: var(--space-sm);
         }
 
         .tab-btn:hover {
             background: var(--bg-card-hover);
-            color: var(--text-primary);
+            color: var(--text-secondary);
         }
 
         .tab-btn.active {
@@ -613,88 +645,32 @@
             to { opacity: 1; }
         }
 
-        /* Section Cards */
+        /* Section Cards - Clean minimalist style */
         .section-card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-lg);
-            margin-bottom: 20px;
+            margin-bottom: var(--space-lg);
             overflow: hidden;
         }
 
         .section-header {
-            padding: 16px 20px;
+            padding: var(--space-md) var(--space-lg);
             display: flex;
             align-items: center;
             justify-content: space-between;
             border-bottom: 1px solid var(--border-color);
             flex-wrap: wrap;
-            gap: 12px;
+            gap: var(--space-md);
         }
 
         .section-header-left {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: var(--space-md);
         }
 
         .section-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: var(--radius-sm);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-        }
-
-        .section-icon.blue { background: var(--kalinka-blue-dim); }
-        .section-icon.green { background: var(--accent-green-dim); }
-        .section-icon.peach { background: var(--kalinka-peach-dim); }
-        .section-icon.red { background: var(--kalinka-red-dim); }
-
-        .section-title {
-            font-size: 15px;
-            font-weight: 600;
-        }
-
-        .section-subtitle {
-            font-size: 11px;
-            color: var(--text-muted);
-        }
-
-        .section-body {
-            padding: 20px;
-        }
-
-        /* KPI Grid */
-        .kpi-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .kpi-card {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            padding: 16px;
-            transition: all 0.2s ease;
-        }
-
-        .kpi-card:hover {
-            border-color: var(--kalinka-blue);
-        }
-
-        .kpi-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 10px;
-        }
-
-        .kpi-icon {
             width: 32px;
             height: 32px;
             border-radius: var(--radius-sm);
@@ -704,31 +680,90 @@
             font-size: 14px;
         }
 
+        .section-icon.blue { background: var(--kalinka-blue-dim); }
+        .section-icon.green { background: var(--accent-green-dim); }
+        .section-icon.peach { background: var(--kalinka-peach-dim); }
+        .section-icon.red { background: var(--kalinka-red-dim); }
+
+        .section-title {
+            font-size: var(--text-base);
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .section-subtitle {
+            font-size: var(--text-sm);
+            color: var(--text-muted);
+        }
+
+        .section-body {
+            padding: var(--space-lg);
+        }
+
+        /* KPI Grid - Clean minimalist style */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: var(--space-md);
+            margin-bottom: var(--space-lg);
+        }
+
+        .kpi-card {
+            background: var(--bg-card-elevated);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: var(--space-md);
+            transition: all 0.2s ease;
+        }
+
+        .kpi-card:hover {
+            border-color: var(--border-color-strong);
+            background: var(--bg-card-hover);
+        }
+
+        .kpi-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--space-sm);
+        }
+
+        .kpi-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
         .kpi-trend {
             font-size: 10px;
             font-weight: 600;
-            padding: 3px 8px;
-            border-radius: 10px;
+            padding: 2px 6px;
+            border-radius: 6px;
         }
 
         .kpi-trend.up { background: var(--accent-green-dim); color: var(--accent-green); }
-        .kpi-trend.down { background: var(--kalinka-red-dim); color: var(--kalinka-red); }
-        .kpi-trend.neutral { background: var(--kalinka-blue-dim); color: #4a7bb5; }
+        .kpi-trend.down { background: var(--kalinka-red-dim); color: var(--kalinka-red-bright); }
+        .kpi-trend.neutral { background: var(--kalinka-blue-dim); color: #5a8bc5; }
 
         .kpi-value {
-            font-size: 24px;
+            font-size: var(--text-xl);
             font-weight: 700;
             font-family: 'JetBrains Mono', monospace;
-            letter-spacing: -1px;
+            letter-spacing: -0.5px;
+            color: var(--text-primary);
         }
 
         .kpi-label {
-            font-size: 11px;
-            color: var(--text-secondary);
-            margin-top: 4px;
+            font-size: var(--text-sm);
+            color: var(--text-muted);
+            margin-top: var(--space-xs);
         }
 
-        /* Tables */
+        /* Tables - Clean minimal style */
         .table-wrapper {
             overflow-x: auto;
             border: 1px solid var(--border-color);
@@ -738,12 +773,12 @@
         .data-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 12px;
+            font-size: var(--text-sm);
         }
 
         .data-table th {
             text-align: left;
-            padding: 12px 14px;
+            padding: var(--space-sm) var(--space-md);
             font-size: 10px;
             font-weight: 600;
             letter-spacing: 0.5px;
@@ -755,9 +790,10 @@
         }
 
         .data-table td {
-            padding: 12px 14px;
+            padding: var(--space-sm) var(--space-md);
             border-bottom: 1px solid var(--border-color);
             vertical-align: middle;
+            color: var(--text-secondary);
         }
 
         .data-table tr:last-child td {
@@ -770,6 +806,7 @@
 
         .data-table .mono {
             font-family: 'JetBrains Mono', monospace;
+            color: var(--text-primary);
         }
 
         .data-table .amount {
@@ -779,22 +816,22 @@
 
         .data-table .amount-negative {
             font-weight: 600;
-            color: var(--kalinka-red);
+            color: var(--kalinka-red-bright);
         }
 
-        /* Badges */
+        /* Badges - Subtle style */
         .badge {
             display: inline-block;
-            padding: 3px 8px;
-            border-radius: 10px;
+            padding: 2px 8px;
+            border-radius: var(--radius-sm);
             font-size: 10px;
-            font-weight: 600;
+            font-weight: 500;
         }
 
-        .badge.blue { background: var(--kalinka-blue-dim); color: #4a7bb5; }
+        .badge.blue { background: var(--kalinka-blue-dim); color: #5a8bc5; }
         .badge.green { background: var(--accent-green-dim); color: var(--accent-green); }
         .badge.peach { background: var(--kalinka-peach-dim); color: var(--kalinka-peach); }
-        .badge.red { background: var(--kalinka-red-dim); color: var(--kalinka-red); }
+        .badge.red { background: var(--kalinka-red-dim); color: var(--kalinka-red-bright); }
 
         /* Progress Bar */
         .progress-bar {
@@ -818,14 +855,14 @@
 
         /* Buttons */
         .btn {
-            padding: 10px 18px;
-            border: none;
+            padding: var(--space-sm) var(--space-md);
+            border: 1px solid transparent;
             border-radius: var(--radius-sm);
             font-family: inherit;
-            font-size: 12px;
-            font-weight: 600;
+            font-size: var(--text-sm);
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.15s ease;
             display: inline-flex;
             align-items: center;
             gap: 6px;
@@ -882,34 +919,72 @@
             color: var(--kalinka-red);
         }
 
-        /* Plan vs Fact Chart */
+        /* Plan vs Fact Chart - Enhanced with tooltips and labels */
+        .plan-fact-wrapper {
+            margin: var(--space-lg) 0;
+        }
+
+        .plan-fact-kpis {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-md);
+            margin-bottom: var(--space-lg);
+            padding: var(--space-md);
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+        }
+
+        .plan-fact-kpi {
+            text-align: center;
+            padding: var(--space-sm);
+        }
+
+        .plan-fact-kpi-value {
+            font-size: var(--text-lg);
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-primary);
+        }
+
+        .plan-fact-kpi-value.positive { color: var(--accent-green); }
+        .plan-fact-kpi-value.negative { color: var(--kalinka-red-bright); }
+
+        .plan-fact-kpi-label {
+            font-size: var(--text-sm);
+            color: var(--text-muted);
+            margin-top: var(--space-xs);
+        }
+
         .plan-fact-chart {
             display: grid;
             grid-template-columns: repeat(12, 1fr);
-            gap: 8px;
-            margin: 20px 0;
+            gap: var(--space-sm);
         }
 
         .month-bar {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 8px;
+            gap: var(--space-sm);
+            position: relative;
         }
 
         .month-bar-container {
             width: 100%;
-            height: 120px;
+            height: 140px;
             display: flex;
             align-items: flex-end;
             gap: 2px;
+            position: relative;
         }
 
         .month-bar-plan, .month-bar-fact {
             flex: 1;
             border-radius: 4px 4px 0 0;
             min-height: 4px;
-            transition: height 0.5s ease;
+            transition: height 0.4s ease;
+            cursor: pointer;
+            position: relative;
         }
 
         .month-bar-plan {
@@ -922,43 +997,145 @@
         }
 
         .month-bar-fact.under {
-            background: var(--kalinka-red);
+            background: var(--kalinka-red-bright);
         }
+
+        /* Bar value labels */
+        .bar-value-label {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 9px;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-muted);
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .month-bar:hover .bar-value-label {
+            opacity: 1;
+        }
+
+        /* Tooltip */
+        .month-bar-tooltip {
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color-strong);
+            border-radius: var(--radius-sm);
+            padding: var(--space-sm) var(--space-md);
+            font-size: var(--text-sm);
+            white-space: nowrap;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .month-bar:hover .month-bar-tooltip {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .month-bar-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: var(--border-color-strong);
+        }
+
+        .tooltip-row {
+            display: flex;
+            justify-content: space-between;
+            gap: var(--space-md);
+            margin-bottom: var(--space-xs);
+        }
+
+        .tooltip-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .tooltip-label {
+            color: var(--text-muted);
+        }
+
+        .tooltip-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+        }
+
+        .tooltip-value.plan-color { color: var(--kalinka-blue-light); }
+        .tooltip-value.fact-positive { color: var(--accent-green); }
+        .tooltip-value.fact-negative { color: var(--kalinka-red-bright); }
 
         .month-label {
             font-size: 10px;
             color: var(--text-muted);
         }
 
-        /* YTD Summary */
+        /* YTD Summary - Enhanced with clear KPIs */
         .ytd-summary {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-            padding: 20px;
-            background: linear-gradient(135deg, var(--kalinka-blue-dim), var(--accent-green-dim));
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-md);
+            padding: var(--space-lg);
+            background: var(--bg-card-elevated);
+            border: 1px solid var(--border-color);
             border-radius: var(--radius-lg);
-            margin-bottom: 20px;
+            margin-bottom: var(--space-lg);
         }
 
         .ytd-item {
             text-align: center;
+            padding: var(--space-sm) 0;
+            border-right: 1px solid var(--border-color);
+        }
+
+        .ytd-item:last-child {
+            border-right: none;
         }
 
         .ytd-label {
-            font-size: 11px;
-            color: var(--text-secondary);
-            margin-bottom: 6px;
+            font-size: var(--text-sm);
+            color: var(--text-muted);
+            margin-bottom: var(--space-sm);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .ytd-value {
-            font-size: 22px;
+            font-size: var(--text-xl);
             font-weight: 700;
             font-family: 'JetBrains Mono', monospace;
+            color: var(--text-primary);
         }
 
         .ytd-value.positive { color: var(--accent-green); }
-        .ytd-value.negative { color: var(--kalinka-red); }
+        .ytd-value.negative { color: var(--kalinka-red-bright); }
+
+        @media (max-width: 768px) {
+            .ytd-summary {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .ytd-item {
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+            }
+            .ytd-item:nth-child(2n) {
+                border-left: 1px solid var(--border-color);
+            }
+            .ytd-item:nth-last-child(-n+2) {
+                border-bottom: none;
+            }
+        }
 
         /* Modal */
         .modal-overlay {
@@ -1242,11 +1419,117 @@
             justify-content: center;
         }
 
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        }
+
+        .toast {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-soft);
+            min-width: 300px;
+            max-width: 450px;
+            pointer-events: auto;
+            transform: translateX(120%);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .toast.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .toast.hide {
+            transform: translateX(120%);
+            opacity: 0;
+        }
+
+        .toast-icon {
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .toast-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .toast-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .toast-message {
+            font-size: 13px;
+            color: var(--text-secondary);
+            word-wrap: break-word;
+        }
+
+        .toast-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 4px;
+            font-size: 16px;
+            line-height: 1;
+            opacity: 0.7;
+            transition: opacity 0.2s ease;
+        }
+
+        .toast-close:hover {
+            opacity: 1;
+        }
+
+        .toast.toast-success {
+            border-left: 3px solid var(--accent-green);
+        }
+
+        .toast.toast-error {
+            border-left: 3px solid var(--kalinka-red-bright);
+        }
+
+        .toast.toast-warning {
+            border-left: 3px solid var(--kalinka-peach);
+        }
+
+        .toast.toast-info {
+            border-left: 3px solid var(--kalinka-blue);
+        }
+
+        @media (max-width: 480px) {
+            .toast-container {
+                left: 10px;
+                right: 10px;
+                top: 10px;
+            }
+            .toast {
+                min-width: auto;
+                max-width: none;
+            }
+        }
+
         /* Search and Filter Bar */
         .filter-bar {
             display: flex;
-            gap: 12px;
-            margin-bottom: 16px;
+            gap: var(--space-md);
+            margin-bottom: var(--space-lg);
             flex-wrap: wrap;
             align-items: center;
         }
@@ -1254,20 +1537,25 @@
         .search-input {
             flex: 1;
             min-width: 200px;
-            padding: 10px 16px;
-            padding-left: 40px;
+            padding: var(--space-sm) var(--space-md);
+            padding-left: 36px;
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-md);
             color: var(--text-primary);
             font-family: inherit;
-            font-size: 13px;
-            transition: all 0.2s ease;
+            font-size: var(--text-sm);
+            transition: all 0.15s ease;
         }
 
         .search-input:focus {
             outline: none;
-            border-color: var(--kalinka-blue);
+            border-color: var(--border-color-strong);
+            background: var(--bg-card-hover);
+        }
+
+        .search-input::placeholder {
+            color: var(--text-muted);
         }
 
         .search-wrapper {
@@ -1286,14 +1574,24 @@
         }
 
         .filter-select {
-            padding: 10px 16px;
+            padding: var(--space-sm) var(--space-md);
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-md);
-            color: var(--text-primary);
+            color: var(--text-secondary);
             font-family: inherit;
-            font-size: 13px;
+            font-size: var(--text-sm);
             cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .filter-select:hover {
+            border-color: var(--border-color-strong);
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--border-color-strong);
         }
 
         /* Sortable Table Headers */
@@ -2484,31 +2782,38 @@
                     </div>
                 </div>
 
-                <!-- Plan vs Fact Chart -->
+                <!-- Plan vs Fact Chart with KPIs -->
                 <div class="section-card">
                     <div class="section-header">
                         <div class="section-header-left">
                             <div class="section-icon green">📈</div>
                             <div>
                                 <div class="section-title">План vs Факт по месяцам</div>
+                                <div class="section-subtitle">Наведите на столбец для деталей</div>
                             </div>
                         </div>
                     </div>
                     <div class="section-body">
-                        <div style="display: flex; gap: 20px; margin-bottom: 12px; font-size: 11px;">
+                        <!-- KPI Summary -->
+                        <div class="plan-fact-kpis" id="planFactKPIs"></div>
+
+                        <!-- Chart Legend -->
+                        <div style="display: flex; gap: 20px; margin-bottom: 16px; font-size: 11px;">
                             <div style="display: flex; align-items: center; gap: 6px;">
                                 <div style="width: 12px; height: 12px; background: var(--kalinka-blue-dim); border: 1px solid var(--kalinka-blue); border-radius: 2px;"></div>
-                                <span style="color: var(--text-secondary);">План</span>
+                                <span style="color: var(--text-muted);">План</span>
                             </div>
                             <div style="display: flex; align-items: center; gap: 6px;">
                                 <div style="width: 12px; height: 12px; background: var(--accent-green); border-radius: 2px;"></div>
-                                <span style="color: var(--text-secondary);">Факт ≥100%</span>
+                                <span style="color: var(--text-muted);">Факт ≥100%</span>
                             </div>
                             <div style="display: flex; align-items: center; gap: 6px;">
-                                <div style="width: 12px; height: 12px; background: var(--kalinka-red); border-radius: 2px;"></div>
-                                <span style="color: var(--text-secondary);">Факт &lt;100%</span>
+                                <div style="width: 12px; height: 12px; background: var(--kalinka-red-bright); border-radius: 2px;"></div>
+                                <span style="color: var(--text-muted);">Факт &lt;100%</span>
                             </div>
                         </div>
+
+                        <!-- Chart -->
                         <div class="plan-fact-chart" id="planFactChart"></div>
                     </div>
                 </div>
@@ -2580,6 +2885,9 @@
         </div>
     </div>
 
+    <!-- Toast Notifications Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
     <!-- Skip Link for Accessibility -->
     <a href="#main-content" class="skip-link">Перейти к основному контенту</a>
 
@@ -2638,7 +2946,9 @@
             targets: {},
             cushion: 0,
             brokers: [...CONFIG.defaultBrokers],
-            syncing: false
+            syncing: false,
+            settingsLoaded: false, // Track if plan targets have loaded
+            dealsLoaded: false     // Track if deals have loaded
         };
 
         // =============================================
@@ -3035,6 +3345,7 @@
             const dealsUnsub = db.collection('deals').orderBy('createdAt', 'desc')
                 .onSnapshot(snap => {
                     state.deals = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    state.dealsLoaded = true;
                     renderAll();
                     setSyncStatus('');
                 }, err => {
@@ -3092,6 +3403,8 @@
                         state.targets = (data && data.targets) || {};
                         state.cushion = (data && data.cushion) || 0;
                         state.brokers = (data && data.brokers) || [...CONFIG.defaultBrokers];
+                        state.settingsLoaded = true;
+                        renderOverview(); // Fix: update YTD Plan when targets load
                         renderPlanning();
                         renderFinance();
                         renderBrokers();
@@ -3157,6 +3470,55 @@
             pendingDeleteAction = null;
         }
 
+        // Toast Notification System
+        function showToast(message, type = 'info', duration = 4000) {
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+
+            const icons = {
+                success: '✓',
+                error: '✕',
+                warning: '⚠',
+                info: 'ℹ'
+            };
+
+            const titles = {
+                success: 'Успешно',
+                error: 'Ошибка',
+                warning: 'Внимание',
+                info: 'Информация'
+            };
+
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.innerHTML = `
+                <span class="toast-icon">${icons[type] || icons.info}</span>
+                <div class="toast-content">
+                    <div class="toast-title">${titles[type] || titles.info}</div>
+                    <div class="toast-message">${message}</div>
+                </div>
+                <button class="toast-close" onclick="this.parentElement.remove()">✕</button>
+            `;
+
+            container.appendChild(toast);
+
+            // Trigger animation
+            requestAnimationFrame(() => {
+                toast.classList.add('show');
+            });
+
+            // Auto-remove after duration
+            if (duration > 0) {
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    toast.classList.add('hide');
+                    setTimeout(() => toast.remove(), 300);
+                }, duration);
+            }
+
+            return toast;
+        }
+
         const confirmBtn = document.getElementById('confirmBtn');
         if (confirmBtn) {
             confirmBtn.addEventListener('click', async () => {
@@ -3186,7 +3548,7 @@
                     } catch (err) {
                         console.error('Error deleting deal:', err);
                         setSyncStatus('offline');
-                        alert('Не удалось удалить сделку: ' + (err.message || 'Неизвестная ошибка'));
+                        showToast('Не удалось удалить сделку: ' + (err.message || 'Неизвестная ошибка'), 'error');
                     }
                 }
             );
@@ -3225,7 +3587,7 @@
                     } catch (err) {
                         console.error('Error deleting expense:', err);
                         setSyncStatus('offline');
-                        alert('Не удалось удалить расход: ' + (err.message || 'Неизвестная ошибка'));
+                        showToast('Не удалось удалить расход: ' + (err.message || 'Неизвестная ошибка'), 'error');
                     }
                 }
             );
@@ -3339,7 +3701,7 @@
                     } catch (err) {
                         console.error('Error deleting risk:', err);
                         setSyncStatus('offline');
-                        alert('Не удалось удалить риск: ' + (err.message || 'Неизвестная ошибка'));
+                        showToast('Не удалось удалить риск: ' + (err.message || 'Неизвестная ошибка'), 'error');
                     }
                 }
             );
@@ -3370,13 +3732,31 @@
         }
 
         function renderOverview() {
+            const ytdPlanEl = document.getElementById('ytdPlan');
+            const ytdFactEl = document.getElementById('ytdFact');
+            const ytdPercentEl = document.getElementById('ytdPercent');
+            const ytdForecastEl = document.getElementById('ytdForecast');
+
+            // Show loading state if settings haven't loaded yet
+            if (!state.settingsLoaded) {
+                ytdPlanEl.innerHTML = '<span class="loading-skeleton">Загрузка...</span>';
+                ytdPercentEl.innerHTML = '<span class="loading-skeleton">—</span>';
+                ytdForecastEl.innerHTML = '<span class="loading-skeleton">—</span>';
+            }
+
             const ytd = calculateYTD();
-            document.getElementById('ytdPlan').textContent = formatTHB(ytd.planYTD);
-            document.getElementById('ytdFact').textContent = formatTHB(ytd.factYTD);
-            document.getElementById('ytdPercent').textContent = Math.round(ytd.percent) + '%';
-            document.getElementById('ytdPercent').className = 'ytd-value ' + (ytd.percent >= 100 ? 'positive' : ytd.percent >= 80 ? '' : 'negative');
-            document.getElementById('ytdForecast').textContent = formatTHB(ytd.forecast);
-            document.getElementById('ytdForecast').className = 'ytd-value ' + (ytd.forecast >= ytd.annualTarget ? 'positive' : 'negative');
+
+            // Only update plan-related fields when settings are loaded
+            if (state.settingsLoaded) {
+                ytdPlanEl.textContent = formatTHB(ytd.planYTD);
+                ytdPercentEl.textContent = Math.round(ytd.percent) + '%';
+                ytdPercentEl.className = 'ytd-value ' + (ytd.percent >= 100 ? 'positive' : ytd.percent >= 80 ? '' : 'negative');
+                ytdForecastEl.textContent = formatTHB(ytd.forecast);
+                ytdForecastEl.className = 'ytd-value ' + (ytd.forecast >= ytd.annualTarget ? 'positive' : 'negative');
+            }
+
+            // Fact can be shown even before settings load (from deals)
+            ytdFactEl.textContent = formatTHB(ytd.factYTD);
 
             // KPIs
             const deals = getFilteredDeals();
@@ -3715,10 +4095,10 @@
         window.startMonthEdit = async function(pk) {
             try {
                 await initMonthlyExpenses(pk);
-                alert('Расходы за ' + formatPeriodLabel(pk) + ' готовы к редактированию');
+                showToast('Расходы за ' + formatPeriodLabel(pk) + ' готовы к редактированию', 'success');
             } catch(e) {
                 console.error(e);
-                alert('Ошибка: ' + e.message);
+                showToast('Ошибка: ' + e.message, 'error');
             }
         };
         window.addMonthExp = async function(pk) {
@@ -3728,7 +4108,7 @@
             if (!amt) return;
             var parsedAmt = parseFloat(amt);
             if (isNaN(parsedAmt)) {
-                alert('Введите корректную сумму');
+                showToast('Введите корректную сумму', 'warning');
                 return;
             }
             var cat = prompt('Категория (operations/marketing/salary/rent/other):', 'operations');
@@ -3739,13 +4119,13 @@
                     amount: parsedAmt
                 });
             } catch (err) {
-                alert(err.message || 'Ошибка при добавлении расхода');
+                showToast(err.message || 'Ошибка при добавлении расхода', 'error');
             }
         };
         window.editMonthExp = async function(pk, id) {
             var exp = (state.monthlyExpenses[pk] || []).find(function(e) { return e.id === id; });
             if (!exp) {
-                alert('Расход не найден');
+                showToast('Расход не найден', 'error');
                 return;
             }
             var desc = prompt('Описание:', exp.description);
@@ -3754,7 +4134,7 @@
             if (amt === null) return;
             var parsedAmt = parseFloat(amt);
             if (isNaN(parsedAmt)) {
-                alert('Введите корректную сумму');
+                showToast('Введите корректную сумму', 'warning');
                 return;
             }
             try {
@@ -3764,7 +4144,7 @@
                     amount: parsedAmt
                 });
             } catch (err) {
-                alert(err.message || 'Ошибка при обновлении расхода');
+                showToast(err.message || 'Ошибка при обновлении расхода', 'error');
             }
         };
         window.delMonthExp = async function(pk, id) {
@@ -3772,7 +4152,7 @@
                 try {
                     await deleteMonthlyExpense(pk, id);
                 } catch (err) {
-                    alert(err.message || 'Ошибка при удалении расхода');
+                    showToast(err.message || 'Ошибка при удалении расхода', 'error');
                 }
             }
         };
@@ -3781,7 +4161,7 @@
                 try {
                     await resetMonthlyExpenses(pk);
                 } catch (err) {
-                    alert(err.message || 'Ошибка при сбросе расходов');
+                    showToast(err.message || 'Ошибка при сбросе расходов', 'error');
                 }
             }
         };
@@ -3823,9 +4203,12 @@
             document.getElementById('annualPercent').textContent = Math.round(safeDiv(ytd.factYTD, ytd.annualTarget) * 100) + '%';
             document.getElementById('annualForecast').textContent = formatTHB(ytd.forecast);
 
-            // Chart
+            // Chart data
             let maxVal = 0;
             const monthData = [];
+            let totalPlan = 0, totalFact = 0;
+            const currentMonth = new Date().getMonth() + 1;
+
             for (let m = 1; m <= 12; m++) {
                 const key = getPeriodKey(year, m);
                 const plan = state.targets[key] || 0;
@@ -3833,17 +4216,69 @@
                 const fact = deals.reduce((sum, d) => sum + calculateDealFinancials(d).companyProfit, 0);
                 maxVal = Math.max(maxVal, plan, fact);
                 monthData.push({ month: m, plan, fact });
+                totalPlan += plan;
+                totalFact += fact;
             }
 
+            // Calculate KPIs for chart section
+            const completion = safeDiv(totalFact, totalPlan) * 100;
+            const diff = totalFact - totalPlan;
+            const prevYearFact = 0; // Would need historical data
+            const avgMonthly = safeDiv(totalFact, currentMonth);
+
+            // Render KPI summary above chart
+            const kpiContainer = document.getElementById('planFactKPIs');
+            if (kpiContainer) {
+                kpiContainer.innerHTML = `
+                    <div class="plan-fact-kpi">
+                        <div class="plan-fact-kpi-value">${formatTHB(totalPlan)}</div>
+                        <div class="plan-fact-kpi-label">Годовой план</div>
+                    </div>
+                    <div class="plan-fact-kpi">
+                        <div class="plan-fact-kpi-value ${completion >= 100 ? 'positive' : ''}">${formatTHB(totalFact)}</div>
+                        <div class="plan-fact-kpi-label">Факт YTD</div>
+                    </div>
+                    <div class="plan-fact-kpi">
+                        <div class="plan-fact-kpi-value ${completion >= 100 ? 'positive' : completion >= 80 ? '' : 'negative'}">${Math.round(completion)}%</div>
+                        <div class="plan-fact-kpi-label">Выполнение</div>
+                    </div>
+                    <div class="plan-fact-kpi">
+                        <div class="plan-fact-kpi-value ${diff >= 0 ? 'positive' : 'negative'}">${diff >= 0 ? '+' : ''}${formatTHB(diff)}</div>
+                        <div class="plan-fact-kpi-label">Отклонение</div>
+                    </div>
+                `;
+            }
+
+            // Render enhanced chart with tooltips
             document.getElementById('planFactChart').innerHTML = monthData.map(d => {
                 const planH = maxVal > 0 ? (d.plan / maxVal) * 100 : 0;
                 const factH = maxVal > 0 ? (d.fact / maxVal) * 100 : 0;
                 const isUnder = d.plan > 0 && d.fact < d.plan;
+                const pct = safeDiv(d.fact, d.plan) * 100;
+                const monthDiff = d.fact - d.plan;
                 return `
                     <div class="month-bar">
+                        <div class="month-bar-tooltip">
+                            <div class="tooltip-row">
+                                <span class="tooltip-label">План:</span>
+                                <span class="tooltip-value plan-color">${formatTHB(d.plan)}</span>
+                            </div>
+                            <div class="tooltip-row">
+                                <span class="tooltip-label">Факт:</span>
+                                <span class="tooltip-value ${isUnder ? 'fact-negative' : 'fact-positive'}">${formatTHB(d.fact)}</span>
+                            </div>
+                            <div class="tooltip-row">
+                                <span class="tooltip-label">%:</span>
+                                <span class="tooltip-value ${pct >= 100 ? 'fact-positive' : pct >= 80 ? '' : 'fact-negative'}">${Math.round(pct)}%</span>
+                            </div>
+                            <div class="tooltip-row">
+                                <span class="tooltip-label">Δ:</span>
+                                <span class="tooltip-value ${monthDiff >= 0 ? 'fact-positive' : 'fact-negative'}">${monthDiff >= 0 ? '+' : ''}${formatTHB(monthDiff)}</span>
+                            </div>
+                        </div>
                         <div class="month-bar-container">
-                            <div class="month-bar-plan" style="height: ${planH}%;" title="План: ${formatTHB(d.plan)}"></div>
-                            <div class="month-bar-fact ${isUnder ? 'under' : ''}" style="height: ${factH}%;" title="Факт: ${formatTHB(d.fact)}"></div>
+                            <div class="month-bar-plan" style="height: ${planH}%;"></div>
+                            <div class="month-bar-fact ${isUnder ? 'under' : ''}" style="height: ${factH}%;"></div>
                         </div>
                         <div class="month-label">${CONFIG.monthsShort[d.month - 1]}</div>
                     </div>
@@ -4516,12 +4951,12 @@
             const name = nameInput.value.trim();
             
             if (!name) {
-                alert('Введите имя брокера');
+                showToast('Введите имя брокера', 'warning');
                 return;
             }
             
             if ((state.brokers || []).includes(name)) {
-                alert('Брокер с таким именем уже существует');
+                showToast('Брокер с таким именем уже существует', 'warning');
                 return;
             }
             
@@ -4540,7 +4975,7 @@
                 setSyncStatus('');
             } catch (err) {
                 console.error('Error adding broker:', err);
-                alert('Ошибка при добавлении брокера');
+                showToast('Ошибка при добавлении брокера', 'error');
                 setSyncStatus('offline');
             }
         };
@@ -4550,7 +4985,7 @@
             const brokerDeals = state.deals.filter(d => d.broker === brokerName);
             
             if (brokerDeals.length > 0) {
-                alert(`Невозможно удалить брокера "${brokerName}": у него есть ${brokerDeals.length} сделок. Сначала переназначьте или удалите сделки.`);
+                showToast(`Невозможно удалить брокера "${brokerName}": у него есть ${brokerDeals.length} сделок. Сначала переназначьте или удалите сделки.`, 'warning');
                 return;
             }
             
@@ -4573,7 +5008,7 @@
                         setSyncStatus('');
                     } catch (err) {
                         console.error('Error removing broker:', err);
-                        alert('Ошибка при удалении брокера');
+                        showToast('Ошибка при удалении брокера', 'error');
                         setSyncStatus('offline');
                     }
                 }
@@ -4637,7 +5072,7 @@
 
                 // Validation: if payment status is "received", date is required
                 if (paymentStatus === 'received' && !receivedAt) {
-                    alert('При статусе "Получено" необходимо указать дату получения денег');
+                    showToast('При статусе "Получено" необходимо указать дату получения денег', 'warning');
                     return;
                 }
 
@@ -4645,11 +5080,11 @@
                 const nameEl = document.getElementById('dealName');
                 const amountEl = document.getElementById('dealAmount');
                 if (!nameEl || !nameEl.value.trim()) {
-                    alert('Введите название сделки');
+                    showToast('Введите название сделки', 'warning');
                     return;
                 }
                 if (!amountEl || isNaN(parseFloat(amountEl.value))) {
-                    alert('Введите корректную сумму сделки');
+                    showToast('Введите корректную сумму сделки', 'warning');
                     return;
                 }
 
@@ -4692,7 +5127,7 @@
                     await saveDeal(data, id || null);
                     closeModal('dealModal');
                 } catch (err) {
-                    alert(err.message || 'Ошибка при сохранении сделки');
+                    showToast(err.message || 'Ошибка при сохранении сделки', 'error');
                 }
             });
 
@@ -4702,11 +5137,11 @@
                 const amountEl = document.getElementById('expAmount');
                 const descEl = document.getElementById('expDescription');
                 if (!descEl || !descEl.value.trim()) {
-                    alert('Введите описание расхода');
+                    showToast('Введите описание расхода', 'warning');
                     return;
                 }
                 if (!amountEl || isNaN(parseFloat(amountEl.value))) {
-                    alert('Введите корректную сумму расхода');
+                    showToast('Введите корректную сумму расхода', 'warning');
                     return;
                 }
                 try {
@@ -4719,7 +5154,7 @@
                     closeModal('expenseModal');
                     document.getElementById('expenseForm').reset();
                 } catch (err) {
-                    alert(err.message || 'Ошибка при сохранении расхода');
+                    showToast(err.message || 'Ошибка при сохранении расхода', 'error');
                 }
             });
 
@@ -4729,7 +5164,7 @@
                 const id = document.getElementById('riskId').value;
                 const descEl = document.getElementById('riskDesc');
                 if (!descEl || !descEl.value.trim()) {
-                    alert('Введите описание риска');
+                    showToast('Введите описание риска', 'warning');
                     return;
                 }
                 try {
@@ -4741,7 +5176,7 @@
                     }, id || null);
                     closeModal('riskModal');
                 } catch (err) {
-                    alert(err.message || 'Ошибка при сохранении риска');
+                    showToast(err.message || 'Ошибка при сохранении риска', 'error');
                 }
             });
 
@@ -4758,7 +5193,7 @@
                     await saveSettings({ targets });
                     closeModal('targetsModal');
                 } catch (err) {
-                    alert(err.message || 'Ошибка при сохранении целей');
+                    showToast(err.message || 'Ошибка при сохранении целей', 'error');
                 }
             });
 
@@ -4769,7 +5204,7 @@
                     await saveSettings({ cushion: parseFloat(document.getElementById('cushionAmount').value) || 0 });
                     closeModal('cushionModal');
                 } catch (err) {
-                    alert(err.message || 'Ошибка при сохранении подушки');
+                    showToast(err.message || 'Ошибка при сохранении подушки', 'error');
                 }
             });
 
@@ -4781,11 +5216,11 @@
                 var descEl = document.getElementById('monthExpDesc');
                 var amtEl = document.getElementById('monthExpAmt');
                 if (!descEl || !descEl.value.trim()) {
-                    alert('Введите описание расхода');
+                    showToast('Введите описание расхода', 'warning');
                     return;
                 }
                 if (!amtEl || isNaN(parseFloat(amtEl.value))) {
-                    alert('Введите корректную сумму расхода');
+                    showToast('Введите корректную сумму расхода', 'warning');
                     return;
                 }
                 var data = {
@@ -4801,7 +5236,7 @@
                     }
                     closeModal('monthExpModal');
                 } catch (err) {
-                    alert(err.message || 'Ошибка при сохранении расхода за месяц');
+                    showToast(err.message || 'Ошибка при сохранении расхода за месяц', 'error');
                 }
             });
         }
