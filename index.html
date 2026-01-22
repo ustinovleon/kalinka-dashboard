@@ -3,7 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1A3654">
+    <meta name="description" content="Kalinka Thailand Cloud Dashboard - управление недвижимостью">
     <title>Kalinka Thailand | Cloud Dashboard</title>
+
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="https://firebasestorage.googleapis.com/v0/b/kalinka-dashboard.firebasestorage.app/o/Rise%2FAileen_Villas%2FKalinkaLogoCUT.png?alt=media&token=63ad85a0-abea-4711-bf4e-cc8b9dc26929">
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -3552,6 +3560,88 @@
         // UTILITIES
         // =============================================
         const formatTHB = (amount) => '฿' + Math.round(amount || 0).toLocaleString('en-US');
+
+        // ===== PERFORMANCE OPTIMIZATIONS =====
+
+        // Debounce for search and filters
+        function debounce(func, wait = 300) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Throttle for scroll events
+        function throttle(func, limit = 100) {
+            let inThrottle;
+            return function(...args) {
+                if (!inThrottle) {
+                    func.apply(this, args);
+                    inThrottle = true;
+                    setTimeout(() => inThrottle = false, limit);
+                }
+            };
+        }
+
+        // Memoization for heavy calculations
+        function memoize(fn) {
+            const cache = new Map();
+            return function(...args) {
+                const key = JSON.stringify(args);
+                if (cache.has(key)) return cache.get(key);
+                const result = fn.apply(this, args);
+                cache.set(key, result);
+                return result;
+            };
+        }
+
+        // Button loading state helper
+        function setButtonLoading(button, loading) {
+            if (loading) {
+                button.classList.add('loading');
+                button.disabled = true;
+            } else {
+                button.classList.remove('loading');
+                button.disabled = false;
+            }
+        }
+
+        // Skeleton for table loading
+        function renderTableSkeleton(tbody, rows = 5, cols = 5) {
+            let html = '';
+            for (let i = 0; i < rows; i++) {
+                html += '<tr class="table-loading-row">';
+                for (let j = 0; j < cols; j++) {
+                    const width = j === 0 ? '60%' : '40%';
+                    html += `<td><div class="skeleton skeleton-text" style="width: ${width}"></div></td>`;
+                }
+                html += '</tr>';
+            }
+            tbody.innerHTML = html;
+        }
+
+        // Announce to screen readers
+        function announce(message) {
+            const announcer = document.getElementById('notifications');
+            if (announcer) {
+                announcer.textContent = message;
+                setTimeout(() => { announcer.textContent = ''; }, 1000);
+            }
+        }
+
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(reg => console.log('SW registered:', reg.scope))
+                    .catch(err => console.error('SW registration failed:', err));
+            });
+        }
         
         const formatDate = (dateStr) => {
             if (!dateStr) return '—';
@@ -6494,5 +6584,8 @@
 
         init();
     </script>
+
+    <!-- Notifications announcer for screen readers -->
+    <div id="notifications" aria-live="polite" aria-atomic="true" class="sr-only"></div>
 </body>
 </html>
