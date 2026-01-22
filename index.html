@@ -4448,14 +4448,22 @@
             const deals = getFilteredDeals();
             const activeDeals = deals.filter(d => !['closed', 'lost'].includes(d.stage));
             const closedDeals = deals.filter(d => d.stage === 'closed');
-            const dealsWithStep = activeDeals.filter(d => d.nextStep && d.date);
-            const coverage = safeDiv(dealsWithStep.length, activeDeals.length) * 100;
             const pipeline = activeDeals.reduce((sum, d) => sum + (parseFloat(d.amount) || 0), 0);
+
+            // Monthly plan completion - use selected month or current month if year view
+            const displayYear = state.period.year;
+            const displayMonth = state.period.type === 'year' ? new Date().getMonth() + 1 : state.period.month;
+            const monthKey = getPeriodKey(displayYear, displayMonth);
+            const monthPlan = state.targets[monthKey] || 0;
+            const monthClosedDeals = state.deals.filter(d => d.stage === 'closed' && (d.period || d.closedPeriod) === monthKey);
+            const monthFact = monthClosedDeals.reduce((sum, d) => sum + calculateDealFinancials(d).companyProfit, 0);
+            const monthCompletion = safeDiv(monthFact, monthPlan) * 100;
+            const monthName = CONFIG.months[displayMonth - 1];
 
             document.getElementById('overviewKPIs').innerHTML = `
                 <div class="kpi-card">
-                    <div class="kpi-value">${Math.round(coverage)}%</div>
-                    <div class="kpi-label">Охват планированием (цель ≥90%)</div>
+                    <div class="kpi-value">${Math.round(monthCompletion)}%</div>
+                    <div class="kpi-label">Выполнение плана (${monthName})</div>
                 </div>
                 <div class="kpi-card">
                     <div class="kpi-value">${activeDeals.length}</div>
